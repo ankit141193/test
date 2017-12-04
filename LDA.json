@@ -1,0 +1,705 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\n# Using Latent Dirichlet Allocation to analyze customer reviews",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 1:38:18 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512351438911_528108806",
+      "id": "20171204-013718_834581412",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eUsing Latent Dirichlet Allocation to analyze customer reviews\u003c/h1\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 4, 2017 1:37:18 AM",
+      "dateStarted": "Dec 4, 2017 1:38:18 AM",
+      "dateFinished": "Dec 4, 2017 1:38:18 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "#Verify existance of SparkContenxt\nsc",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 7:55:52 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512289209482_551956725",
+      "id": "20171203-082009_1050442922",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "\u003cpyspark.context.SparkContext object at 0x7f8cccf0ef90\u003e\n"
+      },
+      "dateCreated": "Dec 3, 2017 8:20:09 AM",
+      "dateStarted": "Dec 4, 2017 7:55:52 AM",
+      "dateFinished": "Dec 4, 2017 7:56:51 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512351587990_1322797530",
+      "id": "20171204-013947_802964759",
+      "dateCreated": "Dec 4, 2017 1:39:47 AM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "#Importing packages\r\nfrom collections import defaultdict\r\nfrom pyspark import SparkContext\r\nfrom pyspark.mllib.linalg import Vector, Vectors\r\nfrom pyspark.mllib.clustering import LDA, LDAModel\r\nfrom pyspark.sql import SQLContext\r\nimport re",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 7:59:03 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511029822564_-974596896",
+      "id": "20171118-183022_1552393638",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Nov 18, 2017 6:30:22 PM",
+      "dateStarted": "Dec 4, 2017 7:59:03 AM",
+      "dateFinished": "Dec 4, 2017 7:59:03 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Defining our thresholds \r\nnum_of_stop_words \u003d 50      # Number of most common words to remove, trying to eliminate stop words\r\nnum_topics \u003d 3\t            # Number of topics we are looking for\r\nnum_words_per_topic \u003d 5    # Number of words to display for each topic\r\nmax_iterations \u003d 35         # Max number of times to iterate before finishing",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 7:59:07 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512289814520_1509486179",
+      "id": "20171203-083014_1879266046",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 8:30:14 AM",
+      "dateStarted": "Dec 4, 2017 7:59:07 AM",
+      "dateFinished": "Dec 4, 2017 7:59:07 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "#Importing a file containing textual reviews\ndata3\u003dsc.wholeTextFiles(\"s3://s3-ankit/text/Reviews.csv\")",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:15:40 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512321156609_560216759",
+      "id": "20171203-171236_689058233",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 5:12:36 PM",
+      "dateStarted": "Dec 4, 2017 8:15:40 AM",
+      "dateFinished": "Dec 4, 2017 8:15:40 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Extracting the text from the tuple into an RDD\ndata3\u003ddata3.map(lambda line: line[1])",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:15:42 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512324216904_2055673839",
+      "id": "20171203-180336_985348206",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 6:03:36 PM",
+      "dateStarted": "Dec 4, 2017 8:15:42 AM",
+      "dateFinished": "Dec 4, 2017 8:15:42 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "data3.collect()\n",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:15:45 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512375200688_1478237434",
+      "id": "20171204-081320_1584162238",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "[u\u0027\"On - time. First time with this Airline - would recommend them, On board service was excellent - information from Pilot very good. Would certainly have no hesitation flying with Sun Country again.\"\\r\\n\"Two out of three flights (thus far), my husband, I, and several other Sun Country passengers were detained at entrance to security check due to Sun Country\\ufffds failure to provide a sound passenger list. The second time, my husband and I made two trips back to customer check-in to request help, to no avail. Finally, a security agent was forced...\"\\r\\nNice regional airline proud of being based in Minnesota. Crew was fun and helpful and the planes were clean. Nice flight price was right.\\r\\n\"I always love loving a Minnesota based company and Sun Country has Minnesota Nice written all over it!! Friendly, Helpful, Kind and Understanding are words to describe the people who work for this company.... I have flown with Sun Country many times to many destinations over the years and have always enjoyed their efficient, professionalism combined with their fun loving...\"\\r\\nBeing a nonstop it was a really fantastic flight. We were able to get the bulkhead which give us much more legroom. The only downside is no place to store your carry-on except overhead. But plenty of overhead available. Great service. Friendly staff.\\r\\n\"We were impressed with the direct flight to Bullhead city , my seat wasn\\\u0027t to comfortable ,( 22A ) not much padding in the seat . The service , flight times , snacks , baggage handling was all excellent . This is a good trip to go on and we stayed at Harrahs .\"\\r\\n\"We don\\\u0027t fly too often but when we do we usually fly Delta. Sun Country offered a flight for a lot less money, so we thought we would give them a try. Sun Country uses Terminal 2, the smaller \\\u0027charter\\\u0027 terminal so everything was on a smaller scale...which is fine with me. The service desk was easy, helpful and friendly...\"\\r\\n\"Be on the alert. If you have an extra $100 to spend for a little luxury once in a while and GREAT food, wait until exactly 24 hours before your flight time, access you flight info in the Sun Country website and grab a roomy first class seat. You will be delighted to have early boarding, plenty of room to...\"\\r\\n\"As someone who walks very slow, using a cane, the staff was very helpful, polite and courteous. The plane was clean, although some of the seats were a little \"\"saggy\"\" in the seat [needed to be reinforced or replaced], and the leg room was good in first class, and the food was good, although you do not get a choice...\"\\r\\nIt sure makes sense the way they board economy from the back first! All went smoothly and the flight attendants were great!\\r\\n\"We were quite pleased with our accomodations/service/punctuality. It was our first airline flight in 40 years. No complaints or criticism. We didn;t subscribe to in flight entertainment, so can\\\u0027t comment on that. I can\\\u0027t erase the mark on the rating.\"\\r\\nFlight was good. Only got drinks when you are not first class. This was a charter flight. We enjoyed both going and coming back. Flight attendance are really good.\\r\\n\"I have been a loyal customer with SUN COUNTRY AIRLINES the last 8 years , because they are a airline with great customer service,roomy jets ,excellent flight attendants and great first class indemnities , for a decent price if look on line on Tuesday\\\u0027s (WING IT ).Their UFLY loyalty program for frequent fliers is a great program,you can form a...\"\\r\\nWe flew from mpls to cancun mexico the flight was on time and there staff were great we arrived on time and got are luggage very quickly.Great airlines.\\r\\nThis was a the first time we flew Sun Country. They had the best flight for our price and time that we wanted to fly to Phoenix. Check in was very easy. This is important because I need to have a wheelchair to be able to get to the gate. I think we waited 2 minutes. Flight staff was pleasant...\\r\\nNice that vacation starts out with great service and happy faces. We are always treated great and have also been upgraded to first class for free randomly. Love sun county and will continue to fly with them on our yearly vacation.\\r\\n\"Old Planes, Expensive Food of Poor Quality, Broken Seat Belts, Dirty Interior, Late Arrivals, need I say more. But we landed safe!\"\\r\\nSeating was uncomfortable at best. They reclined but no more than those of a cheapo competitor\\\u0027s seats that don\\\u0027t recline. seat padding was nill.\\r\\n\"Nice clean plane, lots of legroom. Nice flight staff. Ordered sandwiches that didn\\\u0027t cost a lot and got plenty of food. We\\\u0027re never fly any other airline.\"\\r\\n\"Flying first class on a 737 is very comfortable. If you fly economy on one of these sardine cans I feel sorry for you, unless you are under 5 feet tall and weigh less than 100 lbs. It\\\u0027s all about the bottom line. If you can book a flight on an Airbus you will be much more comfortable.\"\\r\\n\"I flew on Sun Country from Minneapolis to LA several times this past summer and fall. Each time the service was excellent, the fares were competitive and the ease of using Terminal 2 in MSP and Terminal 5 in LAX was great. Short lines every time we flew! Sun Country is now my top airline.\"\\r\\n\"I have flown Sun Country for the last 3 years, averaging 6-8 flights a year. The entire flight crew is probably the best of any airline I have ever flown!!!!!!! They are all very attentive, polite, and go out of their way to make sure everyone has what they need when they need and or want it. Even the pilots...\"\\r\\n\"The one thing that stood out the most was the way Sun Country honored veterans, they give veterans priority boarding no matter where they are seated. Both my flights were right on time, service was excellent. Sun Country had sky cap at both airports which made checking baggage a breeze. I have used Sun Country before for my vacation flights...\"\\r\\n\"I got to the airport terminal over two hours in advance and checked my luggage, one piece. Despite being at the terminal early, Sun Country managed to lose my bag. The bag was delivered about 24 hours after landing. The delivery folks woke up half the neighborhood at about midnight on Thanksgiving. The flight itself was fine; the service was...\"\\r\\n\"The flight was awesome for getting exactly what you what you pay for. Nothing more, Crew were friendly and courteous, HOWEVER, the Airport though it may be modern and beautiful and all. However the Airport is NOT!. A.D.A. FRIENDLY. This would be an Administrative matter. The Airport for the traffic flow has inadequate staff. Those in need of assistance for...\"\\r\\n\"Very smooth flight compared to the one I took with Delta. Everything went as planned. With Delta, nothing went as planned.\"\\r\\n\"I have flown on Sun Country off and on for years since relocating to Florida from Minnesota. On a recent flight, I was very pleased to see the same great local Minnesota friendly, helpful staff. The airline also offers meal options to purchase at not too high a price, which helps a weary traveler. MOST important, unlike most other airlines...\"\\r\\n\"Wow, Sun Country. How the mighty have fallen. We used to love flying Sun Country. 1st Class was affordable and very comfortable. But no more. No pillows, no blankets, and frankly, flight attendants that aren\\\u0027t too happy about the no frills approach the airline has moved to. If this is Sun Country\\\u0027s way of \\\u0027competing\\\u0027 with the big airlines, they...\"\\r\\nWe really enjoyed our time with Sun Country. The planes seemed more spacious and the help was exceptional. Great prices and excellent customer service...so good we are flying them again next week.\\r\\n\"If you have a chance to fly Sun Country- whether through MSP or not- you will enjoy their timeliness, service, and staff. Sun Country utilizes the HHH terminal at MSP, which means fewer headaches getting in and out of the airport. I don\\\u0027t know what their systemwide on-time rate is, but I\\\u0027ve yet to have a flight arrive late in...\"\\r\\n\"First time on this airline. It was the cheapest, and you get what you pay for. They do have a sense of Minnesota hospitality and they don\\ufffdt have as many fees hidden in fare as other budget airlines. We boarded and took off late both ways. I\\ufffdd fly again, but only if it\\ufffds the cheapest.\"\\r\\nOur seats were in First class. Our flight boarded on time and departed on time. The meal served was better than average and the service was excellent.\\r\\n\"We were able to board quickly and get off the ground. The staff were attentive to questions I had. We arrived 20 minutes early, which is always a good thing.\"\\r\\n\"It was a package deal from Green Bay. The flight and hotel were included and it was very nice. The airline was very crowded, but nice and the flight attendants were very good.\"\\r\\n\"Flew out economy MSP to Cancun, and flew back first class Cancun to MSP. Both times was excellent. On time, super friendly gate and ticket agents, and then outstanding service on the flight as well from flight attendants, and others. Airfair was cheap. Cost $179 a seat to upgrade to first class on the way back, which we think is...\"\\r\\n\"Our wedding planner booked our flight with Sun County to and from our destination wedding in Mexico October 2017. Prior to wedding planning, my husband and I honestly have never heard of Sun County. We were nervous about riding on the flight initially, but when we arrived, we were pleasantly surprised! Everything was very professional and quick! Decent legroom, clean...\"\\r\\nNice clean plane and very good service. I wish they had a different way to board the plane. It seemed like they skipped all over the place and it took more time than it needed to. Kiss of death if you are in the middle seat and the person in front of you reclines their seat. Pay up so you...\\r\\n\"I love flying sun country, they have breakfast and lunch for you to purchase, digital, movies to rent, pillows blankets, they really think of the customers first, my husband and I have flown economy and first class for leisure vacation trips yes I would prefer first class but sometimes it\\\u0027s not in the budget . Economy is really nice to...\"\\r\\n\"I\\\u0027m 5\\\u00279\"\" and my knees were shoved up against the seat in front of me. I had read reviews that said they have lots of delays, but thought flying in and out of Minneapolis (their hub) I would be fine. Both of my flights were delayed, which they did nothing to compensate us for (not even free snacks or something...\"\\r\\nMandatory requirement that I PURCHASE a seat to get home. I already had a round trip ticket but had to buy a seat on the flight. Supposedly the seat policy was changed after my ticket purchase. I doubt this as I can not find any such information in all of the e-mail I have received from Sun Country. Add to...\\r\\n\"I had to check my bag for 25 dollars when I have carried it on with other flights on Sun Country. If they are going to implement a policy, make sure it\\ufffds the same every time or don\\ufffdt have a policy in the first place for charging someone to check a carry on.\"\\r\\n\"Actually, I hadn\\\u0027t heard of Sun Country but I have been living overseas. Now back in the US and was visiting family in PHX. Had to get home quickly and googled for tickets. Sun Country had the cheapest fare with the best connection. Great customer service and comfy seats on the airline (seemed to have more legroom too). I would...\"\\r\\nAnyone taking this airline has to be out of their minds. They cancelled my flight this evening to Boston for Thanksgiving with my family and offered no solution until Friday. It is unbelievable that they would not be FORCED BY LAW to book you on a different carrier (and pay the difference).\\r\\nWe flew round trip to Santa Rosa.. the fires broke out after I had booked and to my surprise they were willing to work with the customers and allow you to rebook at a later date or change to San Francisco ( turns out neither were necessary). we had a great non stop flight lots of room and a half...\\r\\nCan\\\u0027t tell you enough how much we enjoy Sun Country airlines. We had to make a last minute booking online. All was simple and easy. Only negative was our email confirmation was very slow. I got a middle seat but in row six. Plenty of leg room and not unbearable for the 3 hour flight. Flight attendants we\\\u0027re the best!...\\r\\n\"My husband (and another couple) were returning home after a two week stay in Mexico. Our flight to Mexico was non-stop and was excellent. We had no issues at all. Our return flight was a little more adventurous. Our flight had a stopover in Dallas-Fort Worth. Upon arrival, our captain told us we could not de-plane at our gate as...\"\\r\\nFirst class service all the way from check in to baggage claim. Everyone is professional and warm and friendly. Food was good and plentiful. Drinks were good. Thank you for two great flights.\\r\\ngreat flight great motel also very clean and comfortable.Trip to bay saw many ships had a great time.; Thanks for flying with us! We are so glad you had a great trip!\\r\\n\"Two things that I found extremely stressful in my last flight on a Sun Country flight was 1) the continual screaming and crying of children from a mother who did not parent her children. The kids wined, physically attacked mother and screamed the whole flight. Mother just passively sat there and did not handle the stress that she caused for...; We appreciate you sharing your experience. We will pass along your comments.\"\\r\\n\"This airlines seemed offer a great price and had fair reviews. Unfortunately, when I arrived to the front booth at JFK my connecting flight from NYC to MN to LAX was cancelled. No reason was given, but the employees tried to take care of it. Ultimately, I had to give the airline credit for taking care of its passengers. They...; We appreciate you sharing your experience. We will pass along your comments, we really appreciate you flying with us!\"\\r\\n\u0027]\n"
+      },
+      "dateCreated": "Dec 4, 2017 8:13:20 AM",
+      "dateStarted": "Dec 4, 2017 8:15:45 AM",
+      "dateFinished": "Dec 4, 2017 8:15:46 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# tokenize the data to form our global vocabulary\ntokens \u003d data3.map( lambda document: document.strip().lower()).map( lambda document: re.split(\"[\\s;,#]\", document))       \\\n    .map( lambda word: [x for x in word if x.isalpha()]).map( lambda word: [x for x in word if len(x) \u003e 3] )\n",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:01:21 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512289874431_-1596575844",
+      "id": "20171203-083114_1927383510",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 8:31:14 AM",
+      "dateStarted": "Dec 4, 2017 8:01:21 AM",
+      "dateFinished": "Dec 4, 2017 8:01:21 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "\r\n# 1. Put all the words in one list instead of a list per document\r\n# 2. Mapping 1 to each entry\r\n# 3. Reduce the tuples by key, i.e.: Merge all the tuples together by the word, summing up the counts\r\n# 4. Reverse the tuple so that the count to make \r\n# 5. sort by the word count\r\n\r\ntermCounts \u003d tokens                             \\\r\n    .flatMap(lambda document: document)         \\\r\n    .map(lambda word: (word, 1))                \\\r\n    .reduceByKey( lambda x,y: x + y)            \\\r\n    .map(lambda tuple: (tuple[1], tuple[0]))    \\\r\n    .sortByKey(False)",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:01:24 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 171.966,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512292189390_-1316905553",
+      "id": "20171203-090949_1702297729",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 9:09:49 AM",
+      "dateStarted": "Dec 4, 2017 8:01:24 AM",
+      "dateFinished": "Dec 4, 2017 8:01:24 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "tokens.collect()",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:14:22 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512375235387_-1803255287",
+      "id": "20171204-081355_1179455949",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "[[u\u0027first\u0027, u\u0027time\u0027, u\u0027with\u0027, u\u0027this\u0027, u\u0027airline\u0027, u\u0027would\u0027, u\u0027recommend\u0027, u\u0027them\u0027, u\u0027board\u0027, u\u0027service\u0027, u\u0027excellent\u0027, u\u0027information\u0027, u\u0027from\u0027, u\u0027pilot\u0027, u\u0027very\u0027, u\u0027would\u0027, u\u0027certainly\u0027, u\u0027have\u0027, u\u0027hesitation\u0027, u\u0027flying\u0027, u\u0027with\u0027, u\u0027country\u0027, u\u0027three\u0027, u\u0027flights\u0027, u\u0027husband\u0027, u\u0027several\u0027, u\u0027other\u0027, u\u0027country\u0027, u\u0027passengers\u0027, u\u0027were\u0027, u\u0027detained\u0027, u\u0027entrance\u0027, u\u0027security\u0027, u\u0027check\u0027, u\u0027failure\u0027, u\u0027provide\u0027, u\u0027sound\u0027, u\u0027passenger\u0027, u\u0027second\u0027, u\u0027time\u0027, u\u0027husband\u0027, u\u0027made\u0027, u\u0027trips\u0027, u\u0027back\u0027, u\u0027customer\u0027, u\u0027request\u0027, u\u0027help\u0027, u\u0027finally\u0027, u\u0027security\u0027, u\u0027agent\u0027, u\u0027regional\u0027, u\u0027airline\u0027, u\u0027proud\u0027, u\u0027being\u0027, u\u0027based\u0027, u\u0027crew\u0027, u\u0027helpful\u0027, u\u0027planes\u0027, u\u0027were\u0027, u\u0027nice\u0027, u\u0027flight\u0027, u\u0027price\u0027, u\u0027always\u0027, u\u0027love\u0027, u\u0027loving\u0027, u\u0027minnesota\u0027, u\u0027based\u0027, u\u0027company\u0027, u\u0027country\u0027, u\u0027minnesota\u0027, u\u0027nice\u0027, u\u0027written\u0027, u\u0027over\u0027, u\u0027friendly\u0027, u\u0027helpful\u0027, u\u0027kind\u0027, u\u0027understanding\u0027, u\u0027words\u0027, u\u0027describe\u0027, u\u0027people\u0027, u\u0027work\u0027, u\u0027this\u0027, u\u0027have\u0027, u\u0027flown\u0027, u\u0027with\u0027, u\u0027country\u0027, u\u0027many\u0027, u\u0027times\u0027, u\u0027many\u0027, u\u0027destinations\u0027, u\u0027over\u0027, u\u0027years\u0027, u\u0027have\u0027, u\u0027always\u0027, u\u0027enjoyed\u0027, u\u0027their\u0027, u\u0027efficient\u0027, u\u0027professionalism\u0027, u\u0027combined\u0027, u\u0027with\u0027, u\u0027their\u0027, u\u0027nonstop\u0027, u\u0027really\u0027, u\u0027fantastic\u0027, u\u0027were\u0027, u\u0027able\u0027, u\u0027bulkhead\u0027, u\u0027which\u0027, u\u0027give\u0027, u\u0027much\u0027, u\u0027more\u0027, u\u0027only\u0027, u\u0027downside\u0027, u\u0027place\u0027, u\u0027store\u0027, u\u0027your\u0027, u\u0027except\u0027, u\u0027plenty\u0027, u\u0027overhead\u0027, u\u0027great\u0027, u\u0027friendly\u0027, u\u0027were\u0027, u\u0027impressed\u0027, u\u0027with\u0027, u\u0027direct\u0027, u\u0027flight\u0027, u\u0027bullhead\u0027, u\u0027city\u0027, u\u0027seat\u0027, u\u0027comfortable\u0027, u\u0027much\u0027, u\u0027padding\u0027, u\u0027seat\u0027, u\u0027service\u0027, u\u0027flight\u0027, u\u0027times\u0027, u\u0027snacks\u0027, u\u0027baggage\u0027, u\u0027handling\u0027, u\u0027excellent\u0027, u\u0027this\u0027, u\u0027good\u0027, u\u0027trip\u0027, u\u0027stayed\u0027, u\u0027harrahs\u0027, u\u0027often\u0027, u\u0027when\u0027, u\u0027usually\u0027, u\u0027country\u0027, u\u0027offered\u0027, u\u0027flight\u0027, u\u0027less\u0027, u\u0027money\u0027, u\u0027thought\u0027, u\u0027would\u0027, u\u0027give\u0027, u\u0027them\u0027, u\u0027country\u0027, u\u0027uses\u0027, u\u0027terminal\u0027, u\u0027smaller\u0027, u\u0027terminal\u0027, u\u0027everything\u0027, u\u0027smaller\u0027, u\u0027fine\u0027, u\u0027with\u0027, u\u0027service\u0027, u\u0027desk\u0027, u\u0027easy\u0027, u\u0027helpful\u0027, u\u0027have\u0027, u\u0027extra\u0027, u\u0027spend\u0027, u\u0027little\u0027, u\u0027luxury\u0027, u\u0027once\u0027, u\u0027while\u0027, u\u0027great\u0027, u\u0027food\u0027, u\u0027wait\u0027, u\u0027until\u0027, u\u0027exactly\u0027, u\u0027hours\u0027, u\u0027before\u0027, u\u0027your\u0027, u\u0027flight\u0027, u\u0027time\u0027, u\u0027access\u0027, u\u0027flight\u0027, u\u0027info\u0027, u\u0027country\u0027, u\u0027website\u0027, u\u0027grab\u0027, u\u0027roomy\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027will\u0027, u\u0027delighted\u0027, u\u0027have\u0027, u\u0027early\u0027, u\u0027boarding\u0027, u\u0027plenty\u0027, u\u0027room\u0027, u\u0027someone\u0027, u\u0027walks\u0027, u\u0027very\u0027, u\u0027slow\u0027, u\u0027using\u0027, u\u0027cane\u0027, u\u0027staff\u0027, u\u0027very\u0027, u\u0027helpful\u0027, u\u0027polite\u0027, u\u0027plane\u0027, u\u0027clean\u0027, u\u0027although\u0027, u\u0027some\u0027, u\u0027seats\u0027, u\u0027were\u0027, u\u0027little\u0027, u\u0027seat\u0027, u\u0027reinforced\u0027, u\u0027room\u0027, u\u0027good\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027food\u0027, u\u0027good\u0027, u\u0027although\u0027, u\u0027sure\u0027, u\u0027makes\u0027, u\u0027sense\u0027, u\u0027they\u0027, u\u0027board\u0027, u\u0027economy\u0027, u\u0027from\u0027, u\u0027back\u0027, u\u0027went\u0027, u\u0027smoothly\u0027, u\u0027flight\u0027, u\u0027attendants\u0027, u\u0027were\u0027, u\u0027were\u0027, u\u0027quite\u0027, u\u0027pleased\u0027, u\u0027with\u0027, u\u0027first\u0027, u\u0027airline\u0027, u\u0027flight\u0027, u\u0027complaints\u0027, u\u0027didn\u0027, u\u0027subscribe\u0027, u\u0027flight\u0027, u\u0027entertainment\u0027, u\u0027comment\u0027, u\u0027erase\u0027, u\u0027mark\u0027, u\u0027only\u0027, u\u0027drinks\u0027, u\u0027when\u0027, u\u0027first\u0027, u\u0027this\u0027, u\u0027charter\u0027, u\u0027enjoyed\u0027, u\u0027both\u0027, u\u0027going\u0027, u\u0027coming\u0027, u\u0027flight\u0027, u\u0027attendance\u0027, u\u0027really\u0027, u\u0027have\u0027, u\u0027been\u0027, u\u0027loyal\u0027, u\u0027customer\u0027, u\u0027with\u0027, u\u0027country\u0027, u\u0027airlines\u0027, u\u0027last\u0027, u\u0027years\u0027, u\u0027because\u0027, u\u0027they\u0027, u\u0027airline\u0027, u\u0027with\u0027, u\u0027great\u0027, u\u0027customer\u0027, u\u0027service\u0027, u\u0027roomy\u0027, u\u0027jets\u0027, u\u0027excellent\u0027, u\u0027flight\u0027, u\u0027attendants\u0027, u\u0027great\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027indemnities\u0027, u\u0027decent\u0027, u\u0027price\u0027, u\u0027look\u0027, u\u0027line\u0027, u\u0027ufly\u0027, u\u0027loyalty\u0027, u\u0027program\u0027, u\u0027frequent\u0027, u\u0027fliers\u0027, u\u0027great\u0027, u\u0027program\u0027, u\u0027form\u0027, u\u0027flew\u0027, u\u0027from\u0027, u\u0027mpls\u0027, u\u0027cancun\u0027, u\u0027mexico\u0027, u\u0027flight\u0027, u\u0027time\u0027, u\u0027there\u0027, u\u0027staff\u0027, u\u0027were\u0027, u\u0027great\u0027, u\u0027arrived\u0027, u\u0027time\u0027, u\u0027luggage\u0027, u\u0027very\u0027, u\u0027first\u0027, u\u0027time\u0027, u\u0027flew\u0027, u\u0027they\u0027, u\u0027best\u0027, u\u0027flight\u0027, u\u0027price\u0027, u\u0027time\u0027, u\u0027that\u0027, u\u0027wanted\u0027, u\u0027check\u0027, u\u0027very\u0027, u\u0027this\u0027, u\u0027important\u0027, u\u0027because\u0027, u\u0027need\u0027, u\u0027have\u0027, u\u0027wheelchair\u0027, u\u0027able\u0027, u\u0027think\u0027, u\u0027waited\u0027, u\u0027flight\u0027, u\u0027staff\u0027, u\u0027that\u0027, u\u0027vacation\u0027, u\u0027starts\u0027, u\u0027with\u0027, u\u0027great\u0027, u\u0027service\u0027, u\u0027happy\u0027, u\u0027always\u0027, u\u0027treated\u0027, u\u0027great\u0027, u\u0027have\u0027, u\u0027also\u0027, u\u0027been\u0027, u\u0027upgraded\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027free\u0027, u\u0027love\u0027, u\u0027county\u0027, u\u0027will\u0027, u\u0027continue\u0027, u\u0027with\u0027, u\u0027them\u0027, u\u0027yearly\u0027, u\u0027planes\u0027, u\u0027expensive\u0027, u\u0027food\u0027, u\u0027poor\u0027, u\u0027quality\u0027, u\u0027broken\u0027, u\u0027seat\u0027, u\u0027belts\u0027, u\u0027dirty\u0027, u\u0027interior\u0027, u\u0027late\u0027, u\u0027arrivals\u0027, u\u0027need\u0027, u\u0027landed\u0027, u\u0027uncomfortable\u0027, u\u0027they\u0027, u\u0027reclined\u0027, u\u0027more\u0027, u\u0027than\u0027, u\u0027those\u0027, u\u0027cheapo\u0027, u\u0027seats\u0027, u\u0027that\u0027, u\u0027seat\u0027, u\u0027padding\u0027, u\u0027clean\u0027, u\u0027plane\u0027, u\u0027lots\u0027, u\u0027nice\u0027, u\u0027flight\u0027, u\u0027ordered\u0027, u\u0027sandwiches\u0027, u\u0027that\u0027, u\u0027cost\u0027, u\u0027plenty\u0027, u\u0027never\u0027, u\u0027other\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027very\u0027, u\u0027economy\u0027, u\u0027these\u0027, u\u0027sardine\u0027, u\u0027cans\u0027, u\u0027feel\u0027, u\u0027sorry\u0027, u\u0027unless\u0027, u\u0027under\u0027, u\u0027feet\u0027, u\u0027tall\u0027, u\u0027weigh\u0027, u\u0027less\u0027, u\u0027than\u0027, u\u0027about\u0027, u\u0027bottom\u0027, u\u0027book\u0027, u\u0027flight\u0027, u\u0027airbus\u0027, u\u0027will\u0027, u\u0027much\u0027, u\u0027more\u0027, u\u0027flew\u0027, u\u0027country\u0027, u\u0027from\u0027, u\u0027minneapolis\u0027, u\u0027several\u0027, u\u0027times\u0027, u\u0027this\u0027, u\u0027past\u0027, u\u0027summer\u0027, u\u0027each\u0027, u\u0027time\u0027, u\u0027service\u0027, u\u0027excellent\u0027, u\u0027fares\u0027, u\u0027were\u0027, u\u0027competitive\u0027, u\u0027ease\u0027, u\u0027using\u0027, u\u0027terminal\u0027, u\u0027terminal\u0027, u\u0027short\u0027, u\u0027lines\u0027, u\u0027every\u0027, u\u0027time\u0027, u\u0027country\u0027, u\u0027have\u0027, u\u0027flown\u0027, u\u0027country\u0027, u\u0027last\u0027, u\u0027years\u0027, u\u0027averaging\u0027, u\u0027flights\u0027, u\u0027entire\u0027, u\u0027flight\u0027, u\u0027crew\u0027, u\u0027probably\u0027, u\u0027best\u0027, u\u0027airline\u0027, u\u0027have\u0027, u\u0027ever\u0027, u\u0027they\u0027, u\u0027very\u0027, u\u0027attentive\u0027, u\u0027polite\u0027, u\u0027their\u0027, u\u0027make\u0027, u\u0027sure\u0027, u\u0027everyone\u0027, u\u0027what\u0027, u\u0027they\u0027, u\u0027need\u0027, u\u0027when\u0027, u\u0027they\u0027, u\u0027need\u0027, u\u0027want\u0027, u\u0027even\u0027, u\u0027thing\u0027, u\u0027that\u0027, u\u0027stood\u0027, u\u0027most\u0027, u\u0027country\u0027, u\u0027honored\u0027, u\u0027veterans\u0027, u\u0027they\u0027, u\u0027give\u0027, u\u0027veterans\u0027, u\u0027priority\u0027, u\u0027boarding\u0027, u\u0027matter\u0027, u\u0027where\u0027, u\u0027they\u0027, u\u0027both\u0027, u\u0027flights\u0027, u\u0027were\u0027, u\u0027right\u0027, u\u0027time\u0027, u\u0027service\u0027, u\u0027country\u0027, u\u0027both\u0027, u\u0027airports\u0027, u\u0027which\u0027, u\u0027made\u0027, u\u0027checking\u0027, u\u0027baggage\u0027, u\u0027have\u0027, u\u0027used\u0027, u\u0027country\u0027, u\u0027before\u0027, u\u0027vacation\u0027, u\u0027airport\u0027, u\u0027terminal\u0027, u\u0027over\u0027, u\u0027hours\u0027, u\u0027advance\u0027, u\u0027checked\u0027, u\u0027luggage\u0027, u\u0027despite\u0027, u\u0027being\u0027, u\u0027terminal\u0027, u\u0027early\u0027, u\u0027country\u0027, u\u0027managed\u0027, u\u0027lose\u0027, u\u0027delivered\u0027, u\u0027about\u0027, u\u0027hours\u0027, u\u0027after\u0027, u\u0027delivery\u0027, u\u0027folks\u0027, u\u0027woke\u0027, u\u0027half\u0027, u\u0027neighborhood\u0027, u\u0027about\u0027, u\u0027midnight\u0027, u\u0027flight\u0027, u\u0027itself\u0027, u\u0027fine\u0027, u\u0027service\u0027, u\u0027flight\u0027, u\u0027awesome\u0027, u\u0027getting\u0027, u\u0027exactly\u0027, u\u0027what\u0027, u\u0027what\u0027, u\u0027nothing\u0027, u\u0027more\u0027, u\u0027crew\u0027, u\u0027were\u0027, u\u0027friendly\u0027, u\u0027courteous\u0027, u\u0027however\u0027, u\u0027airport\u0027, u\u0027though\u0027, u\u0027modern\u0027, u\u0027beautiful\u0027, u\u0027however\u0027, u\u0027airport\u0027, u\u0027this\u0027, u\u0027would\u0027, u\u0027administrative\u0027, u\u0027airport\u0027, u\u0027traffic\u0027, u\u0027flow\u0027, u\u0027inadequate\u0027, u\u0027those\u0027, u\u0027need\u0027, u\u0027assistance\u0027, u\u0027smooth\u0027, u\u0027flight\u0027, u\u0027compared\u0027, u\u0027took\u0027, u\u0027with\u0027, u\u0027everything\u0027, u\u0027went\u0027, u\u0027with\u0027, u\u0027delta\u0027, u\u0027nothing\u0027, u\u0027went\u0027, u\u0027have\u0027, u\u0027flown\u0027, u\u0027country\u0027, u\u0027years\u0027, u\u0027since\u0027, u\u0027relocating\u0027, u\u0027florida\u0027, u\u0027from\u0027, u\u0027recent\u0027, u\u0027flight\u0027, u\u0027very\u0027, u\u0027pleased\u0027, u\u0027same\u0027, u\u0027great\u0027, u\u0027local\u0027, u\u0027minnesota\u0027, u\u0027friendly\u0027, u\u0027helpful\u0027, u\u0027airline\u0027, u\u0027also\u0027, u\u0027offers\u0027, u\u0027meal\u0027, u\u0027options\u0027, u\u0027purchase\u0027, u\u0027high\u0027, u\u0027price\u0027, u\u0027which\u0027, u\u0027helps\u0027, u\u0027weary\u0027, u\u0027most\u0027, u\u0027important\u0027, u\u0027unlike\u0027, u\u0027most\u0027, u\u0027other\u0027, u\u0027mighty\u0027, u\u0027have\u0027, u\u0027used\u0027, u\u0027love\u0027, u\u0027flying\u0027, u\u0027class\u0027, u\u0027affordable\u0027, u\u0027very\u0027, u\u0027pillows\u0027, u\u0027blankets\u0027, u\u0027frankly\u0027, u\u0027flight\u0027, u\u0027attendants\u0027, u\u0027that\u0027, u\u0027happy\u0027, u\u0027about\u0027, u\u0027frills\u0027, u\u0027approach\u0027, u\u0027airline\u0027, u\u0027moved\u0027, u\u0027this\u0027, u\u0027with\u0027, u\u0027airlines\u0027, u\u0027really\u0027, u\u0027enjoyed\u0027, u\u0027time\u0027, u\u0027with\u0027, u\u0027planes\u0027, u\u0027seemed\u0027, u\u0027more\u0027, u\u0027spacious\u0027, u\u0027help\u0027, u\u0027great\u0027, u\u0027prices\u0027, u\u0027excellent\u0027, u\u0027customer\u0027, u\u0027good\u0027, u\u0027flying\u0027, u\u0027them\u0027, u\u0027again\u0027, u\u0027next\u0027, u\u0027have\u0027, u\u0027chance\u0027, u\u0027whether\u0027, u\u0027through\u0027, u\u0027will\u0027, u\u0027enjoy\u0027, u\u0027their\u0027, u\u0027timeliness\u0027, u\u0027service\u0027, u\u0027country\u0027, u\u0027utilizes\u0027, u\u0027terminal\u0027, u\u0027which\u0027, u\u0027means\u0027, u\u0027fewer\u0027, u\u0027headaches\u0027, u\u0027getting\u0027, u\u0027know\u0027, u\u0027what\u0027, u\u0027their\u0027, u\u0027systemwide\u0027, u\u0027rate\u0027, u\u0027have\u0027, u\u0027flight\u0027, u\u0027arrive\u0027, u\u0027late\u0027, u\u0027time\u0027, u\u0027this\u0027, u\u0027cheapest\u0027, u\u0027what\u0027, u\u0027they\u0027, u\u0027have\u0027, u\u0027sense\u0027, u\u0027minnesota\u0027, u\u0027hospitality\u0027, u\u0027they\u0027, u\u0027have\u0027, u\u0027many\u0027, u\u0027fees\u0027, u\u0027hidden\u0027, u\u0027fare\u0027, u\u0027other\u0027, u\u0027budget\u0027, u\u0027boarded\u0027, u\u0027took\u0027, u\u0027late\u0027, u\u0027both\u0027, u\u0027again\u0027, u\u0027only\u0027, u\u0027seats\u0027, u\u0027were\u0027, u\u0027first\u0027, u\u0027flight\u0027, u\u0027boarded\u0027, u\u0027time\u0027, u\u0027departed\u0027, u\u0027meal\u0027, u\u0027served\u0027, u\u0027better\u0027, u\u0027than\u0027, u\u0027average\u0027, u\u0027service\u0027, u\u0027were\u0027, u\u0027able\u0027, u\u0027board\u0027, u\u0027quickly\u0027, u\u0027staff\u0027, u\u0027were\u0027, u\u0027attentive\u0027, u\u0027questions\u0027, u\u0027arrived\u0027, u\u0027minutes\u0027, u\u0027early\u0027, u\u0027which\u0027, u\u0027always\u0027, u\u0027good\u0027, u\u0027package\u0027, u\u0027deal\u0027, u\u0027from\u0027, u\u0027green\u0027, u\u0027flight\u0027, u\u0027hotel\u0027, u\u0027were\u0027, u\u0027included\u0027, u\u0027very\u0027, u\u0027airline\u0027, u\u0027very\u0027, u\u0027crowded\u0027, u\u0027nice\u0027, u\u0027flight\u0027, u\u0027attendants\u0027, u\u0027were\u0027, u\u0027very\u0027, u\u0027economy\u0027, u\u0027cancun\u0027, u\u0027flew\u0027, u\u0027back\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027cancun\u0027, u\u0027both\u0027, u\u0027times\u0027, u\u0027time\u0027, u\u0027super\u0027, u\u0027friendly\u0027, u\u0027gate\u0027, u\u0027ticket\u0027, u\u0027agents\u0027, u\u0027then\u0027, u\u0027outstanding\u0027, u\u0027service\u0027, u\u0027flight\u0027, u\u0027well\u0027, u\u0027from\u0027, u\u0027flight\u0027, u\u0027attendants\u0027, u\u0027airfair\u0027, u\u0027cost\u0027, u\u0027seat\u0027, u\u0027upgrade\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027back\u0027, u\u0027which\u0027, u\u0027think\u0027, u\u0027wedding\u0027, u\u0027planner\u0027, u\u0027booked\u0027, u\u0027flight\u0027, u\u0027with\u0027, u\u0027county\u0027, u\u0027from\u0027, u\u0027destination\u0027, u\u0027wedding\u0027, u\u0027mexico\u0027, u\u0027october\u0027, u\u0027prior\u0027, u\u0027wedding\u0027, u\u0027planning\u0027, u\u0027husband\u0027, u\u0027honestly\u0027, u\u0027have\u0027, u\u0027never\u0027, u\u0027heard\u0027, u\u0027were\u0027, u\u0027nervous\u0027, u\u0027about\u0027, u\u0027riding\u0027, u\u0027flight\u0027, u\u0027initially\u0027, u\u0027when\u0027, u\u0027arrived\u0027, u\u0027were\u0027, u\u0027pleasantly\u0027, u\u0027everything\u0027, u\u0027very\u0027, u\u0027professional\u0027, u\u0027decent\u0027, u\u0027legroom\u0027, u\u0027clean\u0027, u\u0027plane\u0027, u\u0027very\u0027, u\u0027good\u0027, u\u0027wish\u0027, u\u0027they\u0027, u\u0027different\u0027, u\u0027board\u0027, u\u0027seemed\u0027, u\u0027like\u0027, u\u0027they\u0027, u\u0027skipped\u0027, u\u0027over\u0027, u\u0027place\u0027, u\u0027took\u0027, u\u0027more\u0027, u\u0027time\u0027, u\u0027than\u0027, u\u0027needed\u0027, u\u0027kiss\u0027, u\u0027death\u0027, u\u0027middle\u0027, u\u0027seat\u0027, u\u0027person\u0027, u\u0027front\u0027, u\u0027reclines\u0027, u\u0027their\u0027, u\u0027love\u0027, u\u0027flying\u0027, u\u0027country\u0027, u\u0027they\u0027, u\u0027have\u0027, u\u0027breakfast\u0027, u\u0027lunch\u0027, u\u0027purchase\u0027, u\u0027digital\u0027, u\u0027movies\u0027, u\u0027rent\u0027, u\u0027pillows\u0027, u\u0027blankets\u0027, u\u0027they\u0027, u\u0027really\u0027, u\u0027think\u0027, u\u0027customers\u0027, u\u0027first\u0027, u\u0027husband\u0027, u\u0027have\u0027, u\u0027flown\u0027, u\u0027economy\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027leisure\u0027, u\u0027vacation\u0027, u\u0027trips\u0027, u\u0027would\u0027, u\u0027prefer\u0027, u\u0027first\u0027, u\u0027class\u0027, u\u0027sometimes\u0027, u\u0027budget\u0027, u\u0027economy\u0027, u\u0027really\u0027, u\u0027nice\u0027, u\u0027knees\u0027, u\u0027were\u0027, u\u0027shoved\u0027, u\u0027against\u0027, u\u0027seat\u0027, u\u0027front\u0027, u\u0027read\u0027, u\u0027reviews\u0027, u\u0027that\u0027, u\u0027said\u0027, u\u0027they\u0027, u\u0027have\u0027, u\u0027lots\u0027, u\u0027delays\u0027, u\u0027thought\u0027, u\u0027flying\u0027, u\u0027minneapolis\u0027, u\u0027would\u0027, u\u0027both\u0027, u\u0027flights\u0027, u\u0027were\u0027, u\u0027delayed\u0027, u\u0027which\u0027, u\u0027they\u0027, u\u0027nothing\u0027, u\u0027compensate\u0027, u\u0027even\u0027, u\u0027free\u0027, u\u0027snacks\u0027, u\u0027requirement\u0027, u\u0027that\u0027, u\u0027purchase\u0027, u\u0027seat\u0027, u\u0027already\u0027, u\u0027round\u0027, u\u0027trip\u0027, u\u0027ticket\u0027, u\u0027seat\u0027, u\u0027supposedly\u0027, u\u0027seat\u0027, u\u0027policy\u0027, u\u0027changed\u0027, u\u0027after\u0027, u\u0027ticket\u0027, u\u0027doubt\u0027, u\u0027this\u0027, u\u0027find\u0027, u\u0027such\u0027, u\u0027information\u0027, u\u0027have\u0027, u\u0027received\u0027, u\u0027from\u0027, u\u0027check\u0027, u\u0027dollars\u0027, u\u0027when\u0027, u\u0027have\u0027, u\u0027carried\u0027, u\u0027with\u0027, u\u0027other\u0027, u\u0027flights\u0027, u\u0027they\u0027, u\u0027going\u0027, u\u0027implement\u0027, u\u0027policy\u0027, u\u0027make\u0027, u\u0027sure\u0027, u\u0027same\u0027, u\u0027every\u0027, u\u0027time\u0027, u\u0027have\u0027, u\u0027policy\u0027, u\u0027first\u0027, u\u0027place\u0027, u\u0027charging\u0027, u\u0027someone\u0027, u\u0027check\u0027, u\u0027carry\u0027, u\u0027heard\u0027, u\u0027country\u0027, u\u0027have\u0027, u\u0027been\u0027, u\u0027living\u0027, u\u0027back\u0027, u\u0027visiting\u0027, u\u0027family\u0027, u\u0027home\u0027, u\u0027quickly\u0027, u\u0027googled\u0027, u\u0027country\u0027, u\u0027cheapest\u0027, u\u0027fare\u0027, u\u0027with\u0027, u\u0027best\u0027, u\u0027great\u0027, u\u0027customer\u0027, u\u0027service\u0027, u\u0027comfy\u0027, u\u0027seats\u0027, u\u0027airline\u0027, u\u0027have\u0027, u\u0027more\u0027, u\u0027legroom\u0027, u\u0027taking\u0027, u\u0027this\u0027, u\u0027airline\u0027, u\u0027their\u0027, u\u0027they\u0027, u\u0027cancelled\u0027, u\u0027flight\u0027, u\u0027this\u0027, u\u0027evening\u0027, u\u0027boston\u0027, u\u0027thanksgiving\u0027, u\u0027with\u0027, u\u0027family\u0027, u\u0027offered\u0027, u\u0027solution\u0027, u\u0027until\u0027, u\u0027unbelievable\u0027, u\u0027that\u0027, u\u0027they\u0027, u\u0027would\u0027, u\u0027forced\u0027, u\u0027book\u0027, u\u0027different\u0027, u\u0027carrier\u0027, u\u0027flew\u0027, u\u0027round\u0027, u\u0027trip\u0027, u\u0027santa\u0027, u\u0027fires\u0027, u\u0027broke\u0027, u\u0027after\u0027, u\u0027booked\u0027, u\u0027surprise\u0027, u\u0027they\u0027, u\u0027were\u0027, u\u0027willing\u0027, u\u0027work\u0027, u\u0027with\u0027, u\u0027customers\u0027, u\u0027allow\u0027, u\u0027rebook\u0027, u\u0027later\u0027, u\u0027date\u0027, u\u0027change\u0027, u\u0027francisco\u0027, u\u0027turns\u0027, u\u0027neither\u0027, u\u0027were\u0027, u\u0027great\u0027, u\u0027stop\u0027, u\u0027flight\u0027, u\u0027lots\u0027, u\u0027room\u0027, u\u0027tell\u0027, u\u0027enough\u0027, u\u0027much\u0027, u\u0027enjoy\u0027, u\u0027country\u0027, u\u0027make\u0027, u\u0027last\u0027, u\u0027minute\u0027, u\u0027booking\u0027, u\u0027simple\u0027, u\u0027only\u0027, u\u0027negative\u0027, u\u0027email\u0027, u\u0027confirmation\u0027, u\u0027very\u0027, u\u0027middle\u0027, u\u0027seat\u0027, u\u0027plenty\u0027, u\u0027room\u0027, u\u0027unbearable\u0027, u\u0027hour\u0027, u\u0027flight\u0027, u\u0027attendants\u0027, u\u0027husband\u0027, u\u0027another\u0027, u\u0027were\u0027, u\u0027returning\u0027, u\u0027home\u0027, u\u0027after\u0027, u\u0027week\u0027, u\u0027stay\u0027, u\u0027flight\u0027, u\u0027mexico\u0027, u\u0027issues\u0027, u\u0027return\u0027, u\u0027flight\u0027, u\u0027little\u0027, u\u0027more\u0027, u\u0027flight\u0027, u\u0027stopover\u0027, u\u0027upon\u0027, u\u0027arrival\u0027, u\u0027captain\u0027, u\u0027told\u0027, u\u0027could\u0027, u\u0027gate\u0027, u\u0027class\u0027, u\u0027service\u0027, u\u0027from\u0027, u\u0027check\u0027, u\u0027baggage\u0027, u\u0027everyone\u0027, u\u0027professional\u0027, u\u0027warm\u0027, u\u0027food\u0027, u\u0027good\u0027, u\u0027drinks\u0027, u\u0027were\u0027, u\u0027thank\u0027, u\u0027great\u0027, u\u0027flight\u0027, u\u0027great\u0027, u\u0027motel\u0027, u\u0027also\u0027, u\u0027very\u0027, u\u0027clean\u0027, u\u0027many\u0027, u\u0027ships\u0027, u\u0027great\u0027, u\u0027thanks\u0027, u\u0027flying\u0027, u\u0027with\u0027, u\u0027glad\u0027, u\u0027great\u0027, u\u0027things\u0027, u\u0027that\u0027, u\u0027found\u0027, u\u0027extremely\u0027, u\u0027stressful\u0027, u\u0027last\u0027, u\u0027flight\u0027, u\u0027country\u0027, u\u0027flight\u0027, u\u0027continual\u0027, u\u0027screaming\u0027, u\u0027crying\u0027, u\u0027children\u0027, u\u0027from\u0027, u\u0027mother\u0027, u\u0027parent\u0027, u\u0027kids\u0027, u\u0027wined\u0027, u\u0027physically\u0027, u\u0027attacked\u0027, u\u0027mother\u0027, u\u0027screamed\u0027, u\u0027whole\u0027, u\u0027mother\u0027, u\u0027just\u0027, u\u0027passively\u0027, u\u0027there\u0027, u\u0027handle\u0027, u\u0027stress\u0027, u\u0027that\u0027, u\u0027caused\u0027, u\u0027appreciate\u0027, u\u0027sharing\u0027, u\u0027your\u0027, u\u0027will\u0027, u\u0027pass\u0027, u\u0027along\u0027, u\u0027your\u0027, u\u0027airlines\u0027, u\u0027seemed\u0027, u\u0027offer\u0027, u\u0027great\u0027, u\u0027price\u0027, u\u0027fair\u0027, u\u0027unfortunately\u0027, u\u0027when\u0027, u\u0027arrived\u0027, u\u0027front\u0027, u\u0027booth\u0027, u\u0027connecting\u0027, u\u0027flight\u0027, u\u0027from\u0027, u\u0027reason\u0027, u\u0027given\u0027, u\u0027employees\u0027, u\u0027tried\u0027, u\u0027take\u0027, u\u0027care\u0027, u\u0027ultimately\u0027, u\u0027give\u0027, u\u0027airline\u0027, u\u0027credit\u0027, u\u0027taking\u0027, u\u0027care\u0027, u\u0027appreciate\u0027, u\u0027sharing\u0027, u\u0027your\u0027, u\u0027will\u0027, u\u0027pass\u0027, u\u0027along\u0027, u\u0027your\u0027, u\u0027comments\u0027, u\u0027really\u0027, u\u0027appreciate\u0027, u\u0027flying\u0027, u\u0027with\u0027]]\n"
+      },
+      "dateCreated": "Dec 4, 2017 8:13:55 AM",
+      "dateStarted": "Dec 4, 2017 8:14:22 AM",
+      "dateFinished": "Dec 4, 2017 8:14:22 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "termCounts.take(5)",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:01:28 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512292667021_-2012088808",
+      "id": "20171203-091747_414524131",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "[(40, u\u0027flight\u0027), (26, u\u0027have\u0027), (24, u\u0027were\u0027), (22, u\u0027country\u0027), (22, u\u0027with\u0027)]\n"
+      },
+      "dateCreated": "Dec 3, 2017 9:17:47 AM",
+      "dateStarted": "Dec 4, 2017 8:01:28 AM",
+      "dateFinished": "Dec 4, 2017 8:01:32 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Identify a threshold to remove the top words, in an effort to remove stop words\r\n\r\nthreshold_value \u003d termCounts.take(num_of_stop_words)[num_of_stop_words - 1][0]\r\nthreshold_value",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:01:37 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512292891409_816891589",
+      "id": "20171203-092131_2069784399",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "4\n"
+      },
+      "dateCreated": "Dec 3, 2017 9:21:31 AM",
+      "dateStarted": "Dec 4, 2017 8:01:37 AM",
+      "dateFinished": "Dec 4, 2017 8:01:37 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Retain words with a count less than the threshold identified above, \r\n# Index each one and collect them into a map\r\n\r\nvocabulary \u003d termCounts                         \\\r\n    .filter(lambda x : x[0] \u003c threshold_value)  \\\r\n    .map(lambda x: x[1])                        \\\r\n    .zipWithIndex()                             \\\r\n    .collectAsMap()",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:01:55 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512292930036_1657629233",
+      "id": "20171203-092210_1418021808",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 9:22:10 AM",
+      "dateStarted": "Dec 4, 2017 8:01:55 AM",
+      "dateFinished": "Dec 4, 2017 8:01:55 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "vocabulary",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:01:58 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512292943887_1926415472",
+      "id": "20171203-092223_535447185",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "{u\u0027managed\u0027: 114, u\u0027caused\u0027: 115, u\u0027people\u0027: 416, u\u0027bulkhead\u0027: 116, u\u0027captain\u0027: 117, u\u0027children\u0027: 118, u\u0027issues\u0027: 119, u\u0027seemed\u0027: 0, u\u0027certainly\u0027: 120, u\u0027everything\u0027: 1, u\u0027finally\u0027: 122, u\u0027program\u0027: 36, u\u0027helps\u0027: 123, u\u0027under\u0027: 124, u\u0027sorry\u0027: 125, u\u0027veterans\u0027: 37, u\u0027confirmation\u0027: 126, u\u0027returning\u0027: 127, u\u0027regional\u0027: 128, u\u0027every\u0027: 38, u\u0027ticket\u0027: 2, u\u0027screaming\u0027: 130, u\u0027minute\u0027: 131, u\u0027entire\u0027: 132, u\u0027turns\u0027: 133, u\u0027solution\u0027: 134, u\u0027fewer\u0027: 135, u\u0027round\u0027: 39, u\u0027enjoy\u0027: 40, u\u0027charter\u0027: 136, u\u0027smaller\u0027: 41, u\u0027neighborhood\u0027: 137, u\u0027direct\u0027: 138, u\u0027past\u0027: 139, u\u0027professionalism\u0027: 140, u\u0027second\u0027: 141, u\u0027cost\u0027: 42, u\u0027booth\u0027: 142, u\u0027uncomfortable\u0027: 143, u\u0027pass\u0027: 43, u\u0027drinks\u0027: 44, u\u0027even\u0027: 45, u\u0027hesitation\u0027: 299, u\u0027assistance\u0027: 145, u\u0027pleased\u0027: 46, u\u0027access\u0027: 147, u\u0027ever\u0027: 148, u\u0027told\u0027: 149, u\u0027never\u0027: 47, u\u0027supposedly\u0027: 151, u\u0027understanding\u0027: 152, u\u0027hours\u0027: 3, u\u0027upgrade\u0027: 310, u\u0027along\u0027: 48, u\u0027change\u0027: 154, u\u0027wait\u0027: 155, u\u0027systemwide\u0027: 156, u\u0027passengers\u0027: 157, u\u0027kids\u0027: 158, u\u0027luggage\u0027: 49, u\u0027employees\u0027: 159, u\u0027changed\u0027: 160, u\u0027later\u0027: 455, u\u0027prior\u0027: 161, u\u0027usually\u0027: 162, u\u0027hospitality\u0027: 163, u\u0027implement\u0027: 164, u\u0027makes\u0027: 165, u\u0027options\u0027: 166, u\u0027fantastic\u0027: 167, u\u0027santa\u0027: 428, u\u0027family\u0027: 51, u\u0027extra\u0027: 168, u\u0027shoved\u0027: 169, u\u0027prefer\u0027: 170, u\u0027county\u0027: 52, u\u0027attendance\u0027: 171, u\u0027destination\u0027: 433, u\u0027negative\u0027: 172, u\u0027next\u0027: 173, u\u0027doubt\u0027: 150, u\u0027overhead\u0027: 175, u\u0027recommend\u0027: 176, u\u0027until\u0027: 53, u\u0027loving\u0027: 177, u\u0027entrance\u0027: 178, u\u0027sharing\u0027: 54, u\u0027evening\u0027: 371, u\u0027company\u0027: 179, u\u0027landed\u0027: 180, u\u0027warm\u0027: 181, u\u0027broke\u0027: 182, u\u0027continual\u0027: 183, u\u0027glad\u0027: 184, u\u0027hour\u0027: 185, u\u0027cheapest\u0027: 55, u\u0027work\u0027: 56, u\u0027reviews\u0027: 186, u\u0027movies\u0027: 187, u\u0027itself\u0027: 188, u\u0027three\u0027: 355, u\u0027harrahs\u0027: 189, u\u0027starts\u0027: 190, u\u0027arrive\u0027: 191, u\u0027beautiful\u0027: 192, u\u0027bullhead\u0027: 193, u\u0027snacks\u0027: 57, u\u0027awesome\u0027: 194, u\u0027agent\u0027: 195, u\u0027high\u0027: 196, u\u0027heard\u0027: 58, u\u0027want\u0027: 197, u\u0027sense\u0027: 59, u\u0027legroom\u0027: 60, u\u0027information\u0027: 61, u\u0027provide\u0027: 198, u\u0027stayed\u0027: 199, u\u0027gate\u0027: 62, u\u0027charging\u0027: 200, u\u0027nonstop\u0027: 201, u\u0027fare\u0027: 63, u\u0027unbelievable\u0027: 202, u\u0027tried\u0027: 204, u\u0027cancun\u0027: 4, u\u0027loyalty\u0027: 205, u\u0027frills\u0027: 206, u\u0027plane\u0027: 5, u\u0027coming\u0027: 207, u\u0027date\u0027: 208, u\u0027such\u0027: 209, u\u0027indemnities\u0027: 210, u\u0027purchase\u0027: 6, u\u0027stress\u0027: 211, u\u0027short\u0027: 212, u\u0027relocating\u0027: 213, u\u0027crowded\u0027: 214, u\u0027wheelchair\u0027: 215, u\u0027lines\u0027: 301, u\u0027baggage\u0027: 8, u\u0027green\u0027: 296, u\u0027waited\u0027: 259, u\u0027allow\u0027: 218, u\u0027tall\u0027: 219, u\u0027help\u0027: 64, u\u0027wedding\u0027: 24, u\u0027midnight\u0027: 221, u\u0027through\u0027: 222, u\u0027before\u0027: 65, u\u0027thank\u0027: 223, u\u0027ships\u0027: 224, u\u0027stopover\u0027: 225, u\u0027crew\u0027: 9, u\u0027late\u0027: 10, u\u0027offers\u0027: 226, u\u0027spacious\u0027: 227, u\u0027policy\u0027: 11, u\u0027hidden\u0027: 228, u\u0027then\u0027: 229, u\u0027someone\u0027: 66, u\u0027return\u0027: 231, u\u0027lunch\u0027: 232, u\u0027kiss\u0027: 233, u\u0027half\u0027: 234, u\u0027front\u0027: 12, u\u0027airports\u0027: 235, u\u0027didn\u0027: 236, u\u0027each\u0027: 237, u\u0027found\u0027: 238, u\u0027went\u0027: 13, u\u0027meal\u0027: 67, u\u0027everyone\u0027: 68, u\u0027fires\u0027: 239, u\u0027living\u0027: 240, u\u0027ultimately\u0027: 241, u\u0027cheapo\u0027: 242, u\u0027entertainment\u0027: 243, u\u0027motel\u0027: 244, u\u0027since\u0027: 245, u\u0027rebook\u0027: 246, u\u0027surprise\u0027: 247, u\u0027appreciate\u0027: 7, u\u0027given\u0027: 248, u\u0027free\u0027: 70, u\u0027quite\u0027: 249, u\u0027wined\u0027: 250, u\u0027reason\u0027: 251, u\u0027wanted\u0027: 252, u\u0027care\u0027: 71, u\u0027advance\u0027: 253, u\u0027courteous\u0027: 254, u\u0027could\u0027: 255, u\u0027florida\u0027: 256, u\u0027thing\u0027: 257, u\u0027place\u0027: 14, u\u0027think\u0027: 15, u\u0027frequent\u0027: 217, u\u0027reinforced\u0027: 260, u\u0027already\u0027: 261, u\u0027utilizes\u0027: 262, u\u0027feel\u0027: 263, u\u0027feet\u0027: 264, u\u0027downside\u0027: 265, u\u0027another\u0027: 266, u\u0027fees\u0027: 267, u\u0027carry\u0027: 268, u\u0027quality\u0027: 269, u\u0027destinations\u0027: 270, u\u0027airbus\u0027: 271, u\u0027city\u0027: 272, u\u0027little\u0027: 16, u\u0027checked\u0027: 273, u\u0027comfy\u0027: 275, u\u0027priority\u0027: 276, u\u0027needed\u0027: 274, u\u0027pleasantly\u0027: 383, u\u0027store\u0027: 278, u\u0027exactly\u0027: 72, u\u0027took\u0027: 17, u\u0027padding\u0027: 73, u\u0027boarding\u0027: 74, u\u0027kind\u0027: 279, u\u0027unfortunately\u0027: 280, u\u0027frankly\u0027: 281, u\u0027rate\u0027: 282, u\u0027matter\u0027: 283, u\u0027treated\u0027: 284, u\u0027outstanding\u0027: 285, u\u0027boston\u0027: 286, u\u0027modern\u0027: 287, u\u0027comfortable\u0027: 288, u\u0027rent\u0027: 289, u\u0027take\u0027: 402, u\u0027breakfast\u0027: 290, u\u0027forced\u0027: 291, u\u0027efficient\u0027: 292, u\u0027able\u0027: 18, u\u0027also\u0027: 19, u\u0027find\u0027: 293, u\u0027sandwiches\u0027: 294, u\u0027interior\u0027: 295, u\u0027honestly\u0027: 216, u\u0027sure\u0027: 20, u\u0027unless\u0027: 297, u\u0027though\u0027: 298, u\u0027most\u0027: 21, u\u0027nothing\u0027: 22, u\u0027stood\u0027: 203, u\u0027extremely\u0027: 300, u\u0027average\u0027: 302, u\u0027proud\u0027: 303, u\u0027flow\u0027: 304, u\u0027thanksgiving\u0027: 305, u\u0027weigh\u0027: 306, u\u0027summer\u0027: 388, u\u0027reclined\u0027: 307, u\u0027planning\u0027: 308, u\u0027fine\u0027: 75, u\u0027enjoyed\u0027: 23, u\u0027reclines\u0027: 309, u\u0027slow\u0027: 153, u\u0027based\u0027: 76, u\u0027nervous\u0027: 311, u\u0027delays\u0027: 312, u\u0027written\u0027: 334, u\u0027going\u0027: 77, u\u0027folks\u0027: 313, u\u0027riding\u0027: 314, u\u0027local\u0027: 315, u\u0027handle\u0027: 316, u\u0027means\u0027: 317, u\u0027stop\u0027: 318, u\u0027leisure\u0027: 319, u\u0027october\u0027: 447, u\u0027words\u0027: 320, u\u0027despite\u0027: 220, u\u0027belts\u0027: 321, u\u0027ufly\u0027: 322, u\u0027grab\u0027: 323, u\u0027where\u0027: 324, u\u0027arrival\u0027: 325, u\u0027requirement\u0027: 326, u\u0027fair\u0027: 327, u\u0027physically\u0027: 328, u\u0027best\u0027: 25, u\u0027knees\u0027: 329, u\u0027said\u0027: 330, u\u0027visiting\u0027: 331, u\u0027lots\u0027: 26, u\u0027timeliness\u0027: 332, u\u0027enough\u0027: 258, u\u0027probably\u0027: 335, u\u0027neither\u0027: 336, u\u0027approach\u0027: 337, u\u0027email\u0027: 338, u\u0027affordable\u0027: 339, u\u0027parent\u0027: 340, u\u0027initially\u0027: 341, u\u0027however\u0027: 79, u\u0027weary\u0027: 342, u\u0027jets\u0027: 343, u\u0027received\u0027: 362, u\u0027planner\u0027: 344, u\u0027fliers\u0027: 345, u\u0027taking\u0027: 80, u\u0027against\u0027: 346, u\u0027whole\u0027: 347, u\u0027upgraded\u0027: 333, u\u0027simple\u0027: 349, u\u0027subscribe\u0027: 350, u\u0027agents\u0027: 351, u\u0027expensive\u0027: 352, u\u0027headaches\u0027: 353, u\u0027better\u0027: 354, u\u0027decent\u0027: 81, u\u0027vacation\u0027: 32, u\u0027been\u0027: 27, u\u0027quickly\u0027: 103, u\u0027willing\u0027: 357, u\u0027combined\u0027: 358, u\u0027woke\u0027: 359, u\u0027stressful\u0027: 144, u\u0027website\u0027: 360, u\u0027crying\u0027: 399, u\u0027attacked\u0027: 464, u\u0027offered\u0027: 82, u\u0027prices\u0027: 363, u\u0027attentive\u0027: 83, u\u0027those\u0027: 84, u\u0027pilot\u0027: 364, u\u0027sound\u0027: 365, u\u0027handling\u0027: 366, u\u0027look\u0027: 367, u\u0027unlike\u0027: 368, u\u0027these\u0027: 369, u\u0027mpls\u0027: 370, u\u0027budget\u0027: 85, u\u0027while\u0027: 146, u\u0027cancelled\u0027: 372, u\u0027cane\u0027: 373, u\u0027mexico\u0027: 28, u\u0027averaging\u0027: 374, u\u0027middle\u0027: 86, u\u0027skipped\u0027: 230, u\u0027cans\u0027: 375, u\u0027different\u0027: 87, u\u0027credit\u0027: 376, u\u0027things\u0027: 377, u\u0027make\u0027: 29, u\u0027same\u0027: 88, u\u0027read\u0027: 403, u\u0027several\u0027: 89, u\u0027week\u0027: 379, u\u0027used\u0027: 90, u\u0027unbearable\u0027: 380, u\u0027upon\u0027: 381, u\u0027uses\u0027: 382, u\u0027recent\u0027: 277, u\u0027well\u0027: 384, u\u0027thought\u0027: 91, u\u0027person\u0027: 385, u\u0027detained\u0027: 386, u\u0027mother\u0027: 30, u\u0027spend\u0027: 387, u\u0027comment\u0027: 348, u\u0027departed\u0027: 469, u\u0027just\u0027: 389, u\u0027less\u0027: 92, u\u0027being\u0027: 93, u\u0027money\u0027: 390, u\u0027competitive\u0027: 391, u\u0027thanks\u0027: 392, u\u0027questions\u0027: 393, u\u0027roomy\u0027: 94, u\u0027death\u0027: 394, u\u0027ease\u0027: 395, u\u0027passively\u0027: 396, u\u0027except\u0027: 397, u\u0027easy\u0027: 361, u\u0027fares\u0027: 400, u\u0027administrative\u0027: 401, u\u0027luxury\u0027: 129, u\u0027customers\u0027: 95, u\u0027checking\u0027: 378, u\u0027early\u0027: 31, u\u0027traffic\u0027: 404, u\u0027know\u0027: 405, u\u0027desk\u0027: 406, u\u0027using\u0027: 96, u\u0027blankets\u0027: 97, u\u0027like\u0027: 407, u\u0027hotel\u0027: 408, u\u0027yearly\u0027: 409, u\u0027continue\u0027: 410, u\u0027lose\u0027: 411, u\u0027served\u0027: 412, u\u0027security\u0027: 98, u\u0027because\u0027: 99, u\u0027honored\u0027: 413, u\u0027often\u0027: 414, u\u0027deal\u0027: 415, u\u0027smoothly\u0027: 121, u\u0027some\u0027: 417, u\u0027erase\u0027: 418, u\u0027mighty\u0027: 419, u\u0027arrivals\u0027: 420, u\u0027home\u0027: 100, u\u0027delivered\u0027: 421, u\u0027bottom\u0027: 422, u\u0027googled\u0027: 423, u\u0027comments\u0027: 424, u\u0027boarded\u0027: 101, u\u0027connecting\u0027: 425, u\u0027booking\u0027: 426, u\u0027broken\u0027: 427, u\u0027although\u0027: 50, u\u0027super\u0027: 429, u\u0027carried\u0027: 430, u\u0027getting\u0027: 102, u\u0027dollars\u0027: 431, u\u0027carrier\u0027: 432, u\u0027delighted\u0027: 434, u\u0027airlines\u0027: 35, u\u0027screamed\u0027: 435, u\u0027complaints\u0027: 436, u\u0027right\u0027: 437, u\u0027mark\u0027: 356, u\u0027impressed\u0027: 438, u\u0027there\u0027: 69, u\u0027happy\u0027: 104, u\u0027compensate\u0027: 174, u\u0027form\u0027: 439, u\u0027offer\u0027: 440, u\u0027delayed\u0027: 441, u\u0027delivery\u0027: 442, u\u0027failure\u0027: 443, u\u0027delta\u0027: 444, u\u0027line\u0027: 445, u\u0027info\u0027: 446, u\u0027made\u0027: 78, u\u0027whether\u0027: 448, u\u0027wish\u0027: 449, u\u0027smooth\u0027: 450, u\u0027tell\u0027: 451, u\u0027dirty\u0027: 452, u\u0027planes\u0027: 33, u\u0027minutes\u0027: 453, u\u0027trips\u0027: 105, u\u0027passenger\u0027: 454, u\u0027sometimes\u0027: 398, u\u0027ordered\u0027: 456, u\u0027inadequate\u0027: 457, u\u0027describe\u0027: 458, u\u0027moved\u0027: 459, u\u0027minneapolis\u0027: 106, u\u0027package\u0027: 460, u\u0027walks\u0027: 461, u\u0027request\u0027: 462, u\u0027trip\u0027: 34, u\u0027again\u0027: 107, u\u0027compared\u0027: 463, u\u0027book\u0027: 108, u\u0027digital\u0027: 465, u\u0027poor\u0027: 466, u\u0027airfair\u0027: 467, u\u0027francisco\u0027: 468, u\u0027pillows\u0027: 109, u\u0027polite\u0027: 110, u\u0027stay\u0027: 470, u\u0027chance\u0027: 471, u\u0027important\u0027: 111, u\u0027professional\u0027: 112, u\u0027included\u0027: 472, u\u0027booked\u0027: 113, u\u0027sardine\u0027: 473, u\u0027loyal\u0027: 474, u\u0027once\u0027: 475}\n"
+      },
+      "dateCreated": "Dec 3, 2017 9:22:23 AM",
+      "dateStarted": "Dec 4, 2017 8:01:58 AM",
+      "dateFinished": "Dec 4, 2017 8:01:58 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Convert the given document into a vector of word counts\r\n\r\ndef document_vector(document):\r\n    id \u003d document[1]\r\n    counts \u003d defaultdict(int)\r\n    for token in document[0]:\r\n        if token in vocabulary:\r\n            token_id \u003d vocabulary[token]\r\n            counts[token_id] +\u003d 1\r\n    counts \u003d sorted(counts.items())\r\n    keys \u003d [x[0] for x in counts]\r\n    values \u003d [x[1] for x in counts]\r\n    return (id, Vectors.sparse(len(vocabulary), keys, values))",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:02:05 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512294040278_-1044070966",
+      "id": "20171203-094040_143943052",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 9:40:40 AM",
+      "dateStarted": "Dec 4, 2017 8:02:05 AM",
+      "dateFinished": "Dec 4, 2017 8:02:05 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Process all of the documents into word vectors using the \r\n\r\ndocuments \u003d tokens.zipWithIndex().map(document_vector).map(list)\r\n",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:02:12 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512294153052_1842239185",
+      "id": "20171203-094233_912822587",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 9:42:33 AM",
+      "dateStarted": "Dec 4, 2017 8:02:12 AM",
+      "dateFinished": "Dec 4, 2017 8:02:12 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Inverting the key value to get index value\r\n\r\ninv_voc \u003d {value: key for (key, value) in vocabulary.items()}\r\n",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:02:16 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512294163646_1531392723",
+      "id": "20171203-094243_1002280985",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 3, 2017 9:42:43 AM",
+      "dateStarted": "Dec 4, 2017 8:02:16 AM",
+      "dateFinished": "Dec 4, 2017 8:02:16 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Print topics, showing the top-weighted 10 terms for each topic\r\n\r\nlda_model \u003d LDA.train(documents, k\u003dnum_topics, maxIterations\u003dmax_iterations)\r\ntopic_indices \u003d lda_model.describeTopics(maxTermsPerTopic\u003dnum_words_per_topic)\r\n    \r\n# Print topics, showing the top-weighted 10 terms for each topic\r\nfor i in range(len(topic_indices)):\r\n    print(\"Topic #{0}\\n\".format(i + 1))\r\n    for j in range(len(topic_indices[i][0])):\r\n        print(\"{0}\\t{1}\\n\".format(inv_voc[topic_indices[i][0][j]] \\\r\n            .encode(\u0027utf-8\u0027), topic_indices[i][1][j]))\r\n        \r\nprint(\"{0} topics distributed over {1} documents and {2} unique words\\n\" .format(num_topics, documents.count(), len(vocabulary)))",
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 8:02:19 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512294177721_1039298879",
+      "id": "20171203-094257_1938889170",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "Topic #1\n\nseemed\t0.00505424295953\n\nbest\t0.0049822157329\n\nbeen\t0.00493771102385\n\ncrew\t0.00491934921165\n\nthink\t0.00490713449392\n\nTopic #2\n\nmexico\t0.00494354351306\n\nvacation\t0.00491706033678\n\ntook\t0.00488545807175\n\nalso\t0.00487481475589\n\nlots\t0.00485502341206\n\nTopic #3\n\nappreciate\t0.00502999395327\n\nearly\t0.00498803502504\n\nsure\t0.00493104622834\n\nticket\t0.00489850995821\n\nplane\t0.00488957039609\n\n3 topics distributed over 1 documents and 476 unique words\n\n"
+      },
+      "dateCreated": "Dec 3, 2017 9:42:57 AM",
+      "dateStarted": "Dec 4, 2017 8:02:19 AM",
+      "dateFinished": "Dec 4, 2017 8:02:36 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "agarw145@umn.edu",
+      "dateUpdated": "Dec 4, 2017 1:37:08 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512294235527_-847232247",
+      "id": "20171203-094355_1488216825",
+      "dateCreated": "Dec 3, 2017 9:43:55 AM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "LDA",
+  "id": "932VY5Q76V1511027902",
+  "angularObjects": {
+    "2CZ66272U418151510596353934:shared_process": [],
+    "2CX5JE1BP418151510596353942:shared_process": [],
+    "2D1HGQUY3418151510596353907:shared_process": [],
+    "2CZ4DUATT418151510596353928:shared_process": []
+  },
+  "config": {
+    "isDashboard": false,
+    "looknfeel": "default",
+    "cronExecutingUser": "40458",
+    "cron_updated_by_useremail": "agarw145@umn.edu"
+  },
+  "info": {},
+  "source": "FCN"
+}
