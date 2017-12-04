@@ -722,41 +722,6 @@
       "progressUpdateIntervalMs": 500
     },
     {
-      "user": "pande130@umn.edu",
-      "dateUpdated": "Dec 3, 2017 6:42:30 PM",
-      "config": {
-        "colWidth": 12.0,
-        "graph": {
-          "mode": "table",
-          "height": 300.0,
-          "optionOpen": false,
-          "keys": [],
-          "values": [],
-          "groups": [],
-          "scatter": {}
-        },
-        "enabled": true,
-        "editorMode": "ace/mode/scala",
-        "editorHide": false
-      },
-      "settings": {
-        "params": {},
-        "forms": {}
-      },
-      "jobName": "paragraph_1512241184198_2082418478",
-      "id": "20171202-185944_1934451651",
-      "result": {
-        "code": "ERROR",
-        "type": "TEXT",
-        "msg": "Traceback (most recent call last):\n  File \"/tmp/zeppelin_pyspark-7393478501326668276.py\", line 245, in \u003cmodule\u003e\n    stmts \u003d req.statements().split(\"\\n\")\nAttributeError: \u0027NoneType\u0027 object has no attribute \u0027split\u0027\n"
-      },
-      "dateCreated": "Dec 2, 2017 6:59:44 PM",
-      "dateStarted": "Dec 3, 2017 5:42:01 PM",
-      "dateFinished": "Dec 3, 2017 5:42:02 PM",
-      "status": "ERROR",
-      "progressUpdateIntervalMs": 500
-    },
-    {
       "config": {},
       "settings": {
         "params": {},
