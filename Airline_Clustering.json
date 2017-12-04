@@ -1,0 +1,1322 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\r\n\r\n# Introduction\r\nspark.ml is a new package introduced in Spark 1.2, which aims to provide a uniform set of high-level APIs that help users create and tune practical machine learning pipelines. This tutorial covers an unsupervised machine learning algorithm from the sparkML library: Bisecting K Means.  The tutorial helps demonstrate the power of Spark and AWS by segmenting customers contained in an airline dataset containing over three million rows.  \r\n\r\n## Unsupervised Learning on Airline Dataset\r\nMost airlines are facing tough times due to increased competition and customer demands for a better experience. Cost is no longer the sole deciding factor between  organizations. We will be using customer segmentation to help the airline better understand its customers and tailor its offering by analyzing approximately 2 million trips taken by 1.5  million passengers.",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 11:17:36 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512237567724_-1935858520",
+      "id": "20171202-175927_2066220821",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eIntroduction\u003c/h1\u003e\n\u003cp\u003espark.ml is a new package introduced in Spark 1.2, which aims to provide a uniform set of high-level APIs that help users create and tune practical machine learning pipelines. This tutorial covers an unsupervised machine learning algorithm from the sparkML library: Bisecting K Means. The tutorial helps demonstrate the power of Spark and AWS by segmenting customers contained in an airline dataset containing over three million rows. \u003c/p\u003e\n\u003ch2\u003eSpark ML\u003c/h2\u003e\n\u003cp\u003espark.ml is a new package introduced in Spark 1.2, which aims to provide a uniform set of high-level APIs that help users create and tune practical machine learning pipelines. This tutorial will explore SparkML in detail. Our tutorial will cover both an unsupervised and supervised machine learning algorithm from the sparkML library.\u003cbr/\u003eTo better demonstrate the power of Spark and AWS, the project will demonstrate customer segmentation of an airline dataset. Most airlines are facing tough times due to increased competition and customer demands for a better experience. Cost is no longer the sole deciding factor between organizations. We want to help the airline increase adoption of its airline membership program. We will be using customer segmentation to help the airline better understand its customers and tailor its offering by analyzing approximately 2 million trips taken by 1.5 million passengers.\u003c/p\u003e\n\u003ch2\u003eUnsupervised Learning on Airline Dataset\u003c/h2\u003e\n\u003cp\u003eMost airlines are facing tough times due to increased competition and customer demands for a better experience. Cost is no longer the sole deciding factor between organizations. We will be using customer segmentation to help the airline better understand its customers and tailor its offering by analyzing approximately 2 million trips taken by 1.5 million passengers.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 2, 2017 5:59:27 PM",
+      "dateStarted": "Dec 3, 2017 11:13:41 PM",
+      "dateFinished": "Dec 3, 2017 11:13:41 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n# Dataset\nWe will use airline ticket data in this tutorial.  The focus of the tutorial is on the machine learning algorithm and Spark MLlib, therefore data cleaning and preparation were conducted separately and are not included in the tutorial.\n\nOur dataset is a csv file that consists of airline ticket reservation information.  Each record has a PNR locator id associated with it and can have multiple tickets, users and legs for each PNR number. \n\n**We have the following information:**\n\n|Feature | Description |\n|:-------|:------------|\n| PNRLocatorID | PNR locator id can have multiple tickets, users and legs. |\n| uid | User ID. |\n| PaxName | Deidentified Passenger Name |\n| ServiceStartDate | When the flight takes off. |\n| BookingChannel | How the passenger,booked the flight. |\n| BaseFareAmt | Normalized Fare information. |\n| UflyRewardsNumber | The rewards number,that was provided when booked. |\n| UflyMemberStatus | The Ufly member,status. It will be either Standard or Elite. |\n| age_group | Binned age of the passenger at the time of the flight. |\n| true_origin | Airport code for segment start. |\n| true_destination | Airport code for segment end. |\n| group_size | Normalized group size. |\n| group | Binary: 1 \u003d group, 0 \u003d individual. |\n| seasonality | binned flying seasons, see below for breakdown |\n| days_pre_booked | normalized, number of days between booking date and date of first flight segment. |\n| origin_msp | Binary, true_origin is MSP \u003d 1, all others \u003d 0. |",
+      "user": "patil074@umn.edu",
+      "dateUpdated": "Dec 4, 2017 12:12:29 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511630719126_639807926",
+      "id": "20171125-172519_716940298",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch1\u003eDataset\u003c/h1\u003e\n\u003cp\u003eWe will use airline ticket data in this tutorial. The focus of the tutorial is on the machine learning algorithm and Spark MLlib, therefore data cleaning and preparation were conducted separately and are not included in the tutorial.\u003c/p\u003e\n\u003cp\u003eOur dataset is a csv file that consists of airline ticket reservation information. Each record has a PNR locator id associated with it and can have multiple tickets, users and legs for each PNR number. \u003c/p\u003e\n\u003cp\u003e\u003cstrong\u003eWe have the following information:\u003c/strong\u003e\u003c/p\u003e\n\u003ctable\u003e\n  \u003cthead\u003e\n    \u003ctr\u003e\n      \u003cth align\u003d\"left\"\u003eFeature \u003c/th\u003e\n      \u003cth align\u003d\"left\"\u003eDescription \u003c/th\u003e\n    \u003c/tr\u003e\n  \u003c/thead\u003e\n  \u003ctbody\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003ePNRLocatorID \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003ePNR locator id can have multiple tickets, users and legs. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003euid \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eUser ID. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003ePaxName \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eDeidentified Passenger Name \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003eServiceStartDate \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eWhen the flight takes off. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003eBookingChannel \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eHow the passenger,booked the flight. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003eBaseFareAmt \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eNormalized Fare information. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003eUflyRewardsNumber \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eThe rewards number,that was provided when booked. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003eUflyMemberStatus \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eThe Ufly member,status. It will be either Standard or Elite. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003eage_group \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eBinned age of the passenger at the time of the flight. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003etrue_origin \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eAirport code for segment start. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003etrue_destination \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eAirport code for segment end. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003egroup_size \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eNormalized group size. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003egroup \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eBinary: 1 \u003d group, 0 \u003d individual. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003eseasonality \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003ebinned flying seasons, see below for breakdown \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003edays_pre_booked \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003enormalized, number of days between booking date and date of first flight segment. \u003c/td\u003e\n    \u003c/tr\u003e\n    \u003ctr\u003e\n      \u003ctd align\u003d\"left\"\u003eorigin_msp \u003c/td\u003e\n      \u003ctd align\u003d\"left\"\u003eBinary, true_origin is MSP \u003d 1, all others \u003d 0. \u003c/td\u003e\n    \u003c/tr\u003e\n  \u003c/tbody\u003e\n\u003c/table\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Nov 25, 2017 5:25:19 PM",
+      "dateStarted": "Dec 4, 2017 12:12:29 AM",
+      "dateFinished": "Dec 4, 2017 12:12:29 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n\n### Key for Feature Bins\n####  Age Brackets:\n0-17 -\u003e  0\n18-24 -\u003e 0.11\n25-34 -\u003e 0.22\n35-64 -\u003e  0.48\n65+ -\u003e 1.0\n\n####  Seasonality:\nFeb-May -\u003e 0\nJun-Aug -\u003e 0.33\nSep-Oct -\u003e 0.67\nNov-Jan -\u003e 1.0\n\n####  Booking Channel:\nOther -\u003e 0\nOutside Booking -\u003e0.2\nTour Operator Portal -\u003e 0.4\nSY Vacation -\u003e 0.6\nReservations Booking -\u003e 0.8\nSCA Website Booking -\u003e 1.0",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 4:55:44 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511633997242_807217428",
+      "id": "20171125-181957_415268389",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch3\u003eKey for Feature Bins\u003c/h3\u003e\n\u003ch4\u003eAge Brackets:\u003c/h4\u003e\n\u003cp\u003e0-17 -\u0026gt; 0\u003cbr/\u003e18-24 -\u0026gt; 0.11\u003cbr/\u003e25-34 -\u0026gt; 0.22\u003cbr/\u003e35-64 -\u0026gt; 0.48\u003cbr/\u003e65+ -\u0026gt; 1.0\u003c/p\u003e\n\u003ch4\u003eSeasonality:\u003c/h4\u003e\n\u003cp\u003eFeb-May -\u0026gt; 0\u003cbr/\u003eJun-Aug -\u0026gt; 0.33\u003cbr/\u003eSep-Oct -\u0026gt; 0.67\u003cbr/\u003eNov-Jan -\u0026gt; 1.0\u003c/p\u003e\n\u003ch4\u003eBooking Channel:\u003c/h4\u003e\n\u003cp\u003eOther -\u0026gt; 0\u003cbr/\u003eOutside Booking -\u0026gt;0.2\u003cbr/\u003eTour Operator Portal -\u0026gt; 0.4\u003cbr/\u003eSY Vacation -\u0026gt; 0.6\u003cbr/\u003eReservations Booking -\u0026gt; 0.8\u003cbr/\u003eSCA Website Booking -\u0026gt; 1.0\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Nov 25, 2017 6:19:57 PM",
+      "dateStarted": "Dec 3, 2017 4:55:44 PM",
+      "dateFinished": "Dec 3, 2017 4:55:44 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\r\n\r\n## Spark ML Introduction\r\nspark.ml is a new package introduced in Spark 1.2 and later, which aims to provide a uniform set of high-level APIs that help users create and tune practical machine learning pipelines. This tutorial will explore SparkML in detail. Our tutorial will cover both an unsupervised and supervised machine learning algorithm from the sparkML library. \r\nTo better demonstrate the power of Spark and AWS, the project will demonstrate customer segmentation of an airline dataset. Most airlines are facing tough times due to increased competition and customer demands for a better experience. Cost is no longer the sole deciding factor between  organizations. We want to help the airline increase adoption of its airline membership program. We will be using customer segmentation to help the airline better understand its customers and tailor its offering by analyzing approximately 2 million trips taken by 1.5  million passengers.",
+      "user": "patil074@umn.edu",
+      "dateUpdated": "Dec 4, 2017 12:14:17 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511635338925_1923501514",
+      "id": "20171125-184218_1287344283",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eSpark ML Introduction\u003c/h2\u003e\n\u003cp\u003espark.ml is a new package introduced in Spark 1.2 and later, which aims to provide a uniform set of high-level APIs that help users create and tune practical machine learning pipelines. This tutorial will explore SparkML in detail. Our tutorial will cover both an unsupervised and supervised machine learning algorithm from the sparkML library.\u003cbr/\u003eTo better demonstrate the power of Spark and AWS, the project will demonstrate customer segmentation of an airline dataset. Most airlines are facing tough times due to increased competition and customer demands for a better experience. Cost is no longer the sole deciding factor between organizations. We want to help the airline increase adoption of its airline membership program. We will be using customer segmentation to help the airline better understand its customers and tailor its offering by analyzing approximately 2 million trips taken by 1.5 million passengers.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Nov 25, 2017 6:42:18 PM",
+      "dateStarted": "Dec 4, 2017 12:14:17 AM",
+      "dateFinished": "Dec 4, 2017 12:14:17 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n## Load the data and create a DataFrame. \nDataframes provide a user-friendly API that is uniform across ML algorithms and across multiple languages. ",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 10:19:52 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511636354628_-1841623339",
+      "id": "20171125-185914_242651778",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eLoad the data and create a DataFrame.\u003c/h2\u003e\n\u003cp\u003eDataframes provide a user-friendly API that is uniform across ML algorithms and across multiple languages.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Nov 25, 2017 6:59:14 PM",
+      "dateStarted": "Dec 3, 2017 10:19:52 PM",
+      "dateFinished": "Dec 3, 2017 10:19:52 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# load the data file\r\nsun_country \u003d sqlContext.read.format(\u0027com.databricks.spark.csv\u0027) \\\r\n    .option(\"inferSchema\",True).option(\"header\",True).load(\"s3://s3-ankit/SunCountryNormalized-All.csv\")",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:34:52 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511205447407_946909179",
+      "id": "20171120-191727_176127440",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Nov 20, 2017 7:17:27 PM",
+      "dateStarted": "Dec 4, 2017 5:34:52 PM",
+      "dateFinished": "Dec 4, 2017 5:36:10 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n## Explore the data and describe it. \nIn this case, we processed 3 million rows of data.  Note that in the initial reading of the data all features default to string variables.",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 10:19:08 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512320189920_-1406794763",
+      "id": "20171203-165629_983892110",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eExplore the data and describe it.\u003c/h2\u003e\n\u003cp\u003eIn this case, we processed 3 million rows of data. Note that in the initial reading of the data all features default to string variables.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 4:56:29 PM",
+      "dateStarted": "Dec 3, 2017 10:19:09 PM",
+      "dateFinished": "Dec 3, 2017 10:19:09 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# how many rows of data are in the DataFrame? and describe the DataFrame.\nsun_country.count()",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:36:17 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511634135322_1197568995",
+      "id": "20171125-182215_1078754285",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "3073826\n"
+      },
+      "dateCreated": "Nov 25, 2017 6:22:15 PM",
+      "dateStarted": "Dec 4, 2017 5:36:17 PM",
+      "dateFinished": "Dec 4, 2017 5:36:23 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "sun_country.describe()",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:36:25 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511205476969_-1504310739",
+      "id": "20171120-191756_848003027",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "DataFrame[summary: string, _c0: string, PNRLocatorID: string, uid: string, PaxName: string, BookingChannel: string, BaseFareAmt: string, UFlyRewardsNumber: string, UflyMemberStatus: string, age_group: string, true_origin: string, true_destination: string, group_size: string, group: string, seasonality: string, days_pre_booked: string, origin_msp: string]\n"
+      },
+      "dateCreated": "Nov 20, 2017 7:17:56 PM",
+      "dateStarted": "Dec 4, 2017 5:36:25 PM",
+      "dateFinished": "Dec 4, 2017 5:37:18 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n## Convert the DataFrame to a Python Pandas DataFrame.\nPandas will automatically infer the type of each column. Note the revised data types. \n",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 10:18:41 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512321195606_2072911516",
+      "id": "20171203-171315_239543289",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eConvert the DataFrame to a Python Pandas DataFrame.\u003c/h2\u003e\n\u003cp\u003ePandas will automatically infer the type of each column. Note the revised data types.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 5:13:15 PM",
+      "dateStarted": "Dec 3, 2017 10:18:41 PM",
+      "dateFinished": "Dec 3, 2017 10:18:41 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "# Convert the DataFrame to Python Pandas DataFrame\nsun_country.toPandas()\nsun_country.limit(2)",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:37:34 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511205518697_-1292051940",
+      "id": "20171120-191838_1571721852",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "DataFrame[_c0: int, PNRLocatorID: string, uid: string, PaxName: string, ServiceStartDate: timestamp, BookingChannel: double, BaseFareAmt: double, UFlyRewardsNumber: int, UflyMemberStatus: double, age_group: double, true_origin: string, true_destination: string, group_size: double, group: int, seasonality: double, days_pre_booked: double, origin_msp: int]\n"
+      },
+      "dateCreated": "Nov 20, 2017 7:18:38 PM",
+      "dateStarted": "Dec 4, 2017 5:37:34 PM",
+      "dateFinished": "Dec 4, 2017 5:39:38 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nIn the background, the dataframe consists of Row objects:",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 9:08:10 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512324752106_1386004437",
+      "id": "20171203-181232_1266501826",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eThe dataframe consists of Row objects:\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 6:12:32 PM",
+      "dateStarted": "Dec 3, 2017 6:15:43 PM",
+      "dateFinished": "Dec 3, 2017 6:15:43 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "for line in sun_country.take(5):\n    print line",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:39:49 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511205547827_1542069755",
+      "id": "20171120-191907_648454899",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "Row(_c0\u003d1, PNRLocatorID\u003du\u0027AAAACD\u0027, uid\u003du\u002753544F555444696420493F7C2067657420746869732072696768745445524553412041F41411\u0027, PaxName\u003du\u0027STOUTE\u0027, ServiceStartDate\u003ddatetime.datetime(2013, 8, 25, 0, 0), BookingChannel\u003d0.2, BaseFareAmt\u003d0.0918161308516638, UFlyRewardsNumber\u003d0, UflyMemberStatus\u003d0.0, age_group\u003d0.48, true_origin\u003du\u0027MDW\u0027, true_destination\u003du\u0027SEA\u0027, group_size\u003d0.1, group\u003d0, seasonality\u003d0.33, days_pre_booked\u003d0.183823529411765, origin_msp\u003d0)\nRow(_c0\u003d2, PNRLocatorID\u003du\u0027AAAACD\u0027, uid\u003du\u002753544F555444696420493F7C2067657420746869732072696768745445524553412041F41411\u0027, PaxName\u003du\u0027STOUTE\u0027, ServiceStartDate\u003ddatetime.datetime(2013, 8, 25, 0, 0), BookingChannel\u003d0.2, BaseFareAmt\u003d0.0918161308516638, UFlyRewardsNumber\u003d0, UflyMemberStatus\u003d0.0, age_group\u003d0.48, true_origin\u003du\u0027MDW\u0027, true_destination\u003du\u0027SEA\u0027, group_size\u003d0.1, group\u003d0, seasonality\u003d0.33, days_pre_booked\u003d0.183823529411765, origin_msp\u003d0)\nRow(_c0\u003d3, PNRLocatorID\u003du\u0027AAAACD\u0027, uid\u003du\u002753544F555444696420493F7C2067657420746869732072696768745445524553412041F41411\u0027, PaxName\u003du\u0027STOUTE\u0027, ServiceStartDate\u003ddatetime.datetime(2013, 8, 22, 0, 0), BookingChannel\u003d0.2, BaseFareAmt\u003d0.0918161308516638, UFlyRewardsNumber\u003d0, UflyMemberStatus\u003d0.0, age_group\u003d0.48, true_origin\u003du\u0027MDW\u0027, true_destination\u003du\u0027SEA\u0027, group_size\u003d0.1, group\u003d0, seasonality\u003d0.33, days_pre_booked\u003d0.180672268907563, origin_msp\u003d0)\nRow(_c0\u003d4, PNRLocatorID\u003du\u0027AAAACD\u0027, uid\u003du\u002753544F555444696420493F7C2067657420746869732072696768745445524553412041F41411\u0027, PaxName\u003du\u0027STOUTE\u0027, ServiceStartDate\u003ddatetime.datetime(2013, 8, 22, 0, 0), BookingChannel\u003d0.2, BaseFareAmt\u003d0.0918161308516638, UFlyRewardsNumber\u003d0, UflyMemberStatus\u003d0.0, age_group\u003d0.48, true_origin\u003du\u0027MDW\u0027, true_destination\u003du\u0027SEA\u0027, group_size\u003d0.1, group\u003d0, seasonality\u003d0.33, days_pre_booked\u003d0.180672268907563, origin_msp\u003d0)\nRow(_c0\u003d5, PNRLocatorID\u003du\u0027AAAAMU\u0027, uid\u003du\u00274252554747454D414E44696420493F7C2067657420746869732072696768745045544552M48233\u0027, PaxName\u003du\u0027BRUGPE\u0027, ServiceStartDate\u003ddatetime.datetime(2014, 5, 29, 0, 0), BookingChannel\u003d1.0, BaseFareAmt\u003d0.0687309644670051, UFlyRewardsNumber\u003d0, UflyMemberStatus\u003d0.0, age_group\u003d0.22, true_origin\u003du\u0027MSP\u0027, true_destination\u003du\u0027DCA\u0027, group_size\u003d0.1, group\u003d0, seasonality\u003d0.0, days_pre_booked\u003d0.201680672268908, origin_msp\u003d1)\n"
+      },
+      "dateCreated": "Nov 20, 2017 7:19:07 PM",
+      "dateStarted": "Dec 4, 2017 5:39:49 PM",
+      "dateFinished": "Dec 4, 2017 5:39:50 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nTo view the schema of the dataframe, we can use printSchema(). This operation displays the schema as a visual tree.",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 6:12:23 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512324666850_-152126431",
+      "id": "20171203-181106_1557798474",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eTo view the schema of the dataframe, we can use printSchema(). This operation displays the schema as a visual tree.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 6:11:06 PM",
+      "dateStarted": "Dec 3, 2017 6:12:23 PM",
+      "dateFinished": "Dec 3, 2017 6:12:23 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "sun_country.printSchema()",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:39:57 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511205693979_-550609637",
+      "id": "20171120-192133_1152519283",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "root\n |-- _c0: integer (nullable \u003d true)\n |-- PNRLocatorID: string (nullable \u003d true)\n |-- uid: string (nullable \u003d true)\n |-- PaxName: string (nullable \u003d true)\n |-- ServiceStartDate: timestamp (nullable \u003d true)\n |-- BookingChannel: double (nullable \u003d true)\n |-- BaseFareAmt: double (nullable \u003d true)\n |-- UFlyRewardsNumber: integer (nullable \u003d true)\n |-- UflyMemberStatus: double (nullable \u003d true)\n |-- age_group: double (nullable \u003d true)\n |-- true_origin: string (nullable \u003d true)\n |-- true_destination: string (nullable \u003d true)\n |-- group_size: double (nullable \u003d true)\n |-- group: integer (nullable \u003d true)\n |-- seasonality: double (nullable \u003d true)\n |-- days_pre_booked: double (nullable \u003d true)\n |-- origin_msp: integer (nullable \u003d true)\n\n"
+      },
+      "dateCreated": "Nov 20, 2017 7:21:33 PM",
+      "dateStarted": "Dec 4, 2017 5:39:57 PM",
+      "dateFinished": "Dec 4, 2017 5:39:57 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n## Create a subset of the dataframe with the relevant features.\nFeature Selection was conducted separately.  The features determined to be most important in customer segmentation were the Booking Channel, Base Fare Amount, Age Group, Seasonality, Days PreBooked and if the Origin of the flight was Minneapolis/St Paul (Central Hub) or not. ",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 10:34:37 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512322719613_1133698936",
+      "id": "20171203-173839_49429183",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eCreate a subset of the dataframe with the relevant features.\u003c/h2\u003e\n\u003cp\u003eFeature Selection was conducted separately. The features determined to be most important in customer segmentation were the Booking Channel, Base Fare Amount, Age Group, Seasonality, Days PreBooked and if the Origin of the flight was Minneapolis/St Paul (Central Hub) or not.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 5:38:39 PM",
+      "dateStarted": "Dec 3, 2017 10:34:37 PM",
+      "dateFinished": "Dec 3, 2017 10:34:37 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "cols \u003d [\u0027BookingChannel\u0027,\u0027BaseFareAmt\u0027,\u0027age_group\u0027,\u0027seasonality\u0027,\u0027days_pre_booked\u0027,\u0027origin_msp\u0027]\ndf \u003d sun_country.select(cols)\ndf.limit(5).toPandas()\ndf.printSchema()",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:40:04 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511396969126_-1465157153",
+      "id": "20171123-002929_1180747706",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "root\n |-- BookingChannel: double (nullable \u003d true)\n |-- BaseFareAmt: double (nullable \u003d true)\n |-- age_group: double (nullable \u003d true)\n |-- seasonality: double (nullable \u003d true)\n |-- days_pre_booked: double (nullable \u003d true)\n |-- origin_msp: integer (nullable \u003d true)\n\n"
+      },
+      "dateCreated": "Nov 23, 2017 12:29:29 AM",
+      "dateStarted": "Dec 4, 2017 5:40:04 PM",
+      "dateFinished": "Dec 4, 2017 5:40:05 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nTo further prepare the data for use in the model, we will import the pyspark functions, create a temporary table to capture and recast the features.  Then we will need to convert the feature columns. The model expects strings, and doubles for numeric data. To do this we use cast(). ",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 10:35:50 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512324519831_-374558913",
+      "id": "20171203-180839_1147590397",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eTo further prepare the data for use in the model, we will import the pyspark functions, create a temporary table to capture and recast the features. Then we will need to convert the feature columns. The model expects strings, and doubles for numeric data. To do this we use cast().\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 6:08:39 PM",
+      "dateStarted": "Dec 3, 2017 10:35:50 PM",
+      "dateFinished": "Dec 3, 2017 10:35:50 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "from pyspark.sql.functions import *\n\ndf.registerTempTable(\"datatable\")\n\ndf \u003d sqlContext.sql(\"\"\"\nSELECT cast(BookingChannel as string), cast(age_group as string), BaseFareAmt, cast(seasonality as string), days_pre_booked, cast(origin_msp as string)\nfrom datatable\n\"\"\")\n\ndf.printSchema()\n",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:40:13 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511630640528_-598252738",
+      "id": "20171125-172400_869358059",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "root\n |-- BookingChannel: string (nullable \u003d true)\n |-- age_group: string (nullable \u003d true)\n |-- BaseFareAmt: double (nullable \u003d true)\n |-- seasonality: string (nullable \u003d true)\n |-- days_pre_booked: double (nullable \u003d true)\n |-- origin_msp: string (nullable \u003d true)\n\n"
+      },
+      "dateCreated": "Nov 25, 2017 5:24:00 PM",
+      "dateStarted": "Dec 4, 2017 5:40:13 PM",
+      "dateFinished": "Dec 4, 2017 5:40:13 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n## Convert the features to MLlib specific data types. \nVectors are used to store features that will be used in the unsupervised algorithm.  The features will be prepared via Indexers, Encoders and an Assembler.  Finally, they will be fed into a pipeline for assembly. ",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 11:24:27 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512334822745_1462640190",
+      "id": "20171203-210022_2087162428",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eConvert the features to MLlib specific data types.\u003c/h2\u003e\n\u003cp\u003eVectors are used to store features that will be used in the unsupervised algorithm. The features will be prepared via Indexers, Encoders and an Assembler. Finally, they will be fed into a pipeline for assembly.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 9:00:22 PM",
+      "dateStarted": "Dec 3, 2017 11:24:27 PM",
+      "dateFinished": "Dec 3, 2017 11:24:27 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n## String Indexer\nThe StringIndexer is used for converting categorical values into category indices. \n\n## OneHotEncoder\nThe one-hot encoder maps the column of category indices to a column of binary vectors, with at most a single one-value per row that indicates the input category index. \n\n## VectorAssembler\nThe vector assembler is a transformer that combines a given list of columns into a single vector column. We use it to combine all the raw features which we plan to use in our model. It is useful for combining raw features and features generated by different feature transformers into a single feature vector. \n\n## Pipeline\nFinally, we will also use a pipeline which consists of a series of stages.  Each stage is either an estimator or transformer that runs in the order specified. The input DataFrame is transformed as it passes through each stage. For Transformer stages, the transform() method is called on the DataFrame. For Estimator stages, the fit() method is called.  \n",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 11:47:52 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512334785571_-1655642376",
+      "id": "20171203-205945_1222989365",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eString Indexer\u003c/h2\u003e\n\u003cp\u003eThe StringIndexer is used for converting categorical values into category indices. \u003c/p\u003e\n\u003ch2\u003eOneHotEncoder\u003c/h2\u003e\n\u003cp\u003eThe one-hot encoder maps the column of category indices to a column of binary vectors, with at most a single one-value per row that indicates the input category index. \u003c/p\u003e\n\u003ch2\u003eVectorAssembler\u003c/h2\u003e\n\u003cp\u003eThe vector assembler is a transformer that combines a given list of columns into a single vector column. We use it to combine all the raw features which we plan to use in our model. It is useful for combining raw features and features generated by different feature transformers into a single feature vector. \u003c/p\u003e\n\u003ch2\u003ePipeline\u003c/h2\u003e\n\u003cp\u003eFinally, we will also use a pipeline which consists of a series of stages. Each stage is either an estimator or transformer that runs in the order specified. The input DataFrame is transformed as it passes through each stage. For Transformer stages, the transform() method is called on the DataFrame. For Estimator stages, the fit() method is called.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 8:59:45 PM",
+      "dateStarted": "Dec 3, 2017 11:47:52 PM",
+      "dateFinished": "Dec 3, 2017 11:47:52 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "from pyspark.ml.feature import (VectorAssembler,VectorIndexer,\r\nOneHotEncoder,StringIndexer)\r\nBookingChannel_indexer \u003d StringIndexer(inputCol\u003d\"BookingChannel\", outputCol\u003d\"BookingChannel_indexer\")\r\nage_group_indexer \u003d StringIndexer(inputCol\u003d\"age_group\", outputCol\u003d\"age_group_indexer\")\r\nseasonality_indexer \u003d StringIndexer(inputCol\u003d\"seasonality\", outputCol\u003d\"seasonality_indexer\")\r\norigin_msp_indexer \u003d StringIndexer(inputCol\u003d\"origin_msp\", outputCol\u003d\"origin_msp_indexer\")",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:40:20 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511631006185_2046463584",
+      "id": "20171125-173006_479452173",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Nov 25, 2017 5:30:06 PM",
+      "dateStarted": "Dec 4, 2017 5:40:20 PM",
+      "dateFinished": "Dec 4, 2017 5:40:20 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "BookingChannelEncoder \u003d OneHotEncoder(inputCol \u003d \"BookingChannel_indexer\", outputCol \u003d\"BookingChannelEncoder\")\nAgeGroupEncoder \u003d OneHotEncoder(inputCol \u003d \"age_group_indexer\", outputCol \u003d\"AgeGroupEncoder\")\nSeasonalityEncoder \u003d OneHotEncoder(inputCol \u003d \"seasonality_indexer\", outputCol \u003d\"SeasonalityEncoder\")\nOriginMspEncoder \u003d OneHotEncoder(inputCol \u003d \"origin_msp_indexer\", outputCol \u003d\"OriginMspEncoder\")",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:40:24 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511631259136_1636673712",
+      "id": "20171125-173419_1197037909",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Nov 25, 2017 5:34:19 PM",
+      "dateStarted": "Dec 4, 2017 5:40:24 PM",
+      "dateFinished": "Dec 4, 2017 5:40:24 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "assembler \u003d VectorAssembler(inputCols \u003d [\"BookingChannelEncoder\",\"BaseFareAmt\",\"AgeGroupEncoder\",\"SeasonalityEncoder\",\"days_pre_booked\",\"OriginMspEncoder\"], \noutputCol \u003d \"features\")",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:40:30 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511631566521_2064547306",
+      "id": "20171125-173926_576238368",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Nov 25, 2017 5:39:26 PM",
+      "dateStarted": "Dec 4, 2017 5:40:30 PM",
+      "dateFinished": "Dec 4, 2017 5:40:30 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "from pyspark.ml import Pipeline\r\npipeline \u003d Pipeline(stages\u003d[BookingChannel_indexer, BookingChannelEncoder, age_group_indexer, AgeGroupEncoder, seasonality_indexer, SeasonalityEncoder, origin_msp_indexer, OriginMspEncoder, assembler])\r\nmodel\u003dpipeline.fit(df)\r\nindexed\u003dmodel.transform(df)",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:40:41 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511631705349_-1798949552",
+      "id": "20171125-174145_337381013",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Nov 25, 2017 5:41:45 PM",
+      "dateStarted": "Dec 4, 2017 5:40:41 PM",
+      "dateFinished": "Dec 4, 2017 5:41:01 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "indexed.limit(5).toPandas()",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:41:15 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511632073537_1460210764",
+      "id": "20171125-174753_1577284286",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "  BookingChannel age_group  BaseFareAmt seasonality  days_pre_booked  \\\n0            0.2      0.48     0.091816        0.33         0.183824   \n1            0.2      0.48     0.091816        0.33         0.183824   \n2            0.2      0.48     0.091816        0.33         0.180672   \n3            0.2      0.48     0.091816        0.33         0.180672   \n4            1.0      0.22     0.068731         0.0         0.201681   \n\n  origin_msp  BookingChannel_indexer      BookingChannelEncoder  \\\n0          0                     0.0  (1.0, 0.0, 0.0, 0.0, 0.0)   \n1          0                     0.0  (1.0, 0.0, 0.0, 0.0, 0.0)   \n2          0                     0.0  (1.0, 0.0, 0.0, 0.0, 0.0)   \n3          0                     0.0  (1.0, 0.0, 0.0, 0.0, 0.0)   \n4          1                     1.0  (0.0, 1.0, 0.0, 0.0, 0.0)   \n\n   age_group_indexer       AgeGroupEncoder  seasonality_indexer  \\\n0                0.0  (1.0, 0.0, 0.0, 0.0)                  1.0   \n1                0.0  (1.0, 0.0, 0.0, 0.0)                  1.0   \n2                0.0  (1.0, 0.0, 0.0, 0.0)                  1.0   \n3                0.0  (1.0, 0.0, 0.0, 0.0)                  1.0   \n4                1.0  (0.0, 1.0, 0.0, 0.0)                  0.0   \n\n  SeasonalityEncoder  origin_msp_indexer OriginMspEncoder  \\\n0    (0.0, 1.0, 0.0)                 1.0            (0.0)   \n1    (0.0, 1.0, 0.0)                 1.0            (0.0)   \n2    (0.0, 1.0, 0.0)                 1.0            (0.0)   \n3    (0.0, 1.0, 0.0)                 1.0            (0.0)   \n4    (1.0, 0.0, 0.0)                 0.0            (1.0)   \n\n                                            features  \n0  (1.0, 0.0, 0.0, 0.0, 0.0, 0.0918161308517, 1.0...  \n1  (1.0, 0.0, 0.0, 0.0, 0.0, 0.0918161308517, 1.0...  \n2  (1.0, 0.0, 0.0, 0.0, 0.0, 0.0918161308517, 1.0...  \n3  (1.0, 0.0, 0.0, 0.0, 0.0, 0.0918161308517, 1.0...  \n4  (0.0, 1.0, 0.0, 0.0, 0.0, 0.068730964467, 0.0,...  \n"
+      },
+      "dateCreated": "Nov 25, 2017 5:47:53 PM",
+      "dateStarted": "Dec 4, 2017 5:41:15 PM",
+      "dateFinished": "Dec 4, 2017 5:41:16 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n\n## Applying Bisecting k-means\n\nBisecting K-means can often be much faster than regular K-means, but it will generally produce a different clustering.  Bisecting k-means is a divisive form of hierarchical clustering. \n\nThe implementation in MLlib has the following parameters:\n\n-  setK: the desired number of leaf clusters (default: 4). The actual number could be smaller if there are no divisible leaf clusters.\n-  setMaxIterations: the max number of k-means iterations to split clusters (default: 20)\n-  minDivisibleClusterSize: the minimum number of points (if \u003e\u003d 1.0) or the minimum proportion of points (if \u003c 1.0) of a divisible cluster (default: 1)\n-  seed: a random seed (default: hash value of the class name)\n\n",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 3, 2017 11:55:58 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512236971087_-1187015090",
+      "id": "20171202-174931_972200321",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eApplying Bisecting k-means\u003c/h2\u003e\n\u003cp\u003eBisecting K-means can often be much faster than regular K-means, but it will generally produce a different clustering. Bisecting k-means is a divisive form of hierarchical clustering. \u003c/p\u003e\n\u003cp\u003eThe implementation in MLlib has the following parameters:\u003c/p\u003e\n\u003cul\u003e\n  \u003cli\u003ek: the desired number of leaf clusters (default: 4). The actual number could be smaller if there are no divisible leaf clusters.\u003c/li\u003e\n  \u003cli\u003emaxIterations: the max number of k-means iterations to split clusters (default: 20)\u003c/li\u003e\n  \u003cli\u003eminDivisibleClusterSize: the minimum number of points (if \u0026gt;\u003d 1.0) or the minimum proportion of points (if \u0026lt; 1.0) of a divisible cluster (default: 1)\u003c/li\u003e\n  \u003cli\u003eseed: a random seed (default: hash value of the class name)\u003c/li\u003e\n\u003c/ul\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 2, 2017 5:49:31 PM",
+      "dateStarted": "Dec 3, 2017 6:45:39 PM",
+      "dateFinished": "Dec 3, 2017 6:45:39 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n## Import the algorithm modules and run the model:",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 4, 2017 12:19:21 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512344778823_1742339411",
+      "id": "20171203-234618_169721904",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003ch2\u003eImport the algorithm modules and run the model:\u003c/h2\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 11:46:18 PM",
+      "dateStarted": "Dec 4, 2017 12:19:21 AM",
+      "dateFinished": "Dec 4, 2017 12:19:21 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nIn this case, the best fit for the number of clusters matches the default number of four clusters.  After setting the parameters, fit and transform the model.  The clusters are designated in the named prediction column.  We are calling it \u0027prediction\u0027.",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 4, 2017 12:12:25 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512345070460_1445543123",
+      "id": "20171203-235110_1884410196",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eIn this case, the best fit for the number of clusters matches the default number of four clusters.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 3, 2017 11:51:10 PM",
+      "dateStarted": "Dec 3, 2017 11:56:57 PM",
+      "dateFinished": "Dec 3, 2017 11:56:57 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "from pyspark.ml.clustering import BisectingKMeans\nfrom pyspark.ml.clustering import KMeans\n\n\nbkm \u003d BisectingKMeans().setK(4).setSeed(1).setFeaturesCol(\"features\").setPredictionCol(\"prediction\")\nkmeans_bisecting \u003d bkm.fit(indexed)\noo \u003d kmeans_bisecting.transform(indexed)\n\noo.select(\u0027BookingChannel\u0027, \u0027BaseFareAmt\u0027, \u0027age_group\u0027, \u0027seasonality\u0027, \n\u0027days_pre_booked\u0027,\u0027origin_msp\u0027,\u0027features\u0027, \u0027prediction\u0027).show(truncate \u003d False)",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:41:23 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511632174479_878191303",
+      "id": "20171125-174934_1070295518",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "+--------------+------------------+---------+-----------+-----------------+----------+----------------------------------------------------------------------------+----------+\n|BookingChannel|BaseFareAmt       |age_group|seasonality|days_pre_booked  |origin_msp|features                                                                    |prediction|\n+--------------+------------------+---------+-----------+-----------------+----------+----------------------------------------------------------------------------+----------+\n|0.2           |0.0918161308516638|0.48     |0.33       |0.183823529411765|0         |(15,[0,5,6,11,13],[1.0,0.0918161308516638,1.0,1.0,0.183823529411765])       |2         |\n|0.2           |0.0918161308516638|0.48     |0.33       |0.183823529411765|0         |(15,[0,5,6,11,13],[1.0,0.0918161308516638,1.0,1.0,0.183823529411765])       |2         |\n|0.2           |0.0918161308516638|0.48     |0.33       |0.180672268907563|0         |(15,[0,5,6,11,13],[1.0,0.0918161308516638,1.0,1.0,0.180672268907563])       |2         |\n|0.2           |0.0918161308516638|0.48     |0.33       |0.180672268907563|0         |(15,[0,5,6,11,13],[1.0,0.0918161308516638,1.0,1.0,0.180672268907563])       |2         |\n|1.0           |0.0687309644670051|0.22     |0.0        |0.201680672268908|1         |(15,[1,5,7,10,13,14],[1.0,0.0687309644670051,1.0,1.0,0.201680672268908,1.0])|0         |\n|1.0           |0.0687309644670051|0.22     |0.0        |0.20063025210084 |1         |(15,[1,5,7,10,13,14],[1.0,0.0687309644670051,1.0,1.0,0.20063025210084,1.0]) |0         |\n|1.0           |0.10545967287084  |0.48     |0.67       |0.20063025210084 |1         |(15,[1,5,6,13,14],[1.0,0.10545967287084,1.0,0.20063025210084,1.0])          |1         |\n|1.0           |0.10545967287084  |0.48     |0.67       |0.19327731092437 |1         |(15,[1,5,6,13,14],[1.0,0.10545967287084,1.0,0.19327731092437,1.0])          |1         |\n|1.0           |0.10545967287084  |0.48     |0.67       |0.19327731092437 |1         |(15,[1,5,6,13,14],[1.0,0.10545967287084,1.0,0.19327731092437,1.0])          |1         |\n|1.0           |0.10545967287084  |0.48     |0.67       |0.20063025210084 |1         |(15,[1,5,6,13,14],[1.0,0.10545967287084,1.0,0.20063025210084,1.0])          |1         |\n|1.0           |0.10545967287084  |0.48     |0.67       |0.20063025210084 |1         |(15,[1,5,6,13,14],[1.0,0.10545967287084,1.0,0.20063025210084,1.0])          |1         |\n|1.0           |0.10545967287084  |0.48     |0.67       |0.19327731092437 |1         |(15,[1,5,6,13,14],[1.0,0.10545967287084,1.0,0.19327731092437,1.0])          |1         |\n|1.0           |0.124608009024253 |0.22     |0.33       |0.16281512605042 |1         |(15,[1,5,7,11,13,14],[1.0,0.124608009024253,1.0,1.0,0.16281512605042,1.0])  |0         |\n|1.0           |0.124608009024253 |0.22     |0.33       |0.168067226890756|1         |(15,[1,5,7,11,13,14],[1.0,0.124608009024253,1.0,1.0,0.168067226890756,1.0]) |0         |\n|1.0           |0.124608009024253 |0.0      |0.33       |0.168067226890756|1         |(15,[1,5,8,11,13,14],[1.0,0.124608009024253,1.0,1.0,0.168067226890756,1.0]) |0         |\n|1.0           |0.124608009024253 |0.0      |0.33       |0.16281512605042 |1         |(15,[1,5,8,11,13,14],[1.0,0.124608009024253,1.0,1.0,0.16281512605042,1.0])  |0         |\n|1.0           |0.124608009024253 |0.48     |0.33       |0.16281512605042 |1         |(15,[1,5,6,11,13,14],[1.0,0.124608009024253,1.0,1.0,0.16281512605042,1.0])  |1         |\n|1.0           |0.124608009024253 |0.48     |0.33       |0.168067226890756|1         |(15,[1,5,6,11,13,14],[1.0,0.124608009024253,1.0,1.0,0.168067226890756,1.0]) |1         |\n|1.0           |0.124608009024253 |0.48     |0.33       |0.168067226890756|1         |(15,[1,5,6,11,13,14],[1.0,0.124608009024253,1.0,1.0,0.168067226890756,1.0]) |1         |\n|1.0           |0.124608009024253 |0.48     |0.33       |0.16281512605042 |1         |(15,[1,5,6,11,13,14],[1.0,0.124608009024253,1.0,1.0,0.16281512605042,1.0])  |1         |\n+--------------+------------------+---------+-----------+-----------------+----------+----------------------------------------------------------------------------+----------+\nonly showing top 20 rows\n\n"
+      },
+      "dateCreated": "Nov 25, 2017 5:49:34 PM",
+      "dateStarted": "Dec 4, 2017 5:41:23 PM",
+      "dateFinished": "Dec 4, 2017 5:53:20 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "df \u003d oo.select(\u0027BookingChannel\u0027, \u0027BaseFareAmt\u0027, \u0027age_group\u0027, \u0027seasonality\u0027, \n\u0027days_pre_booked\u0027,\u0027origin_msp\u0027, \u0027prediction\u0027)\n\n",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 5:58:27 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512410060982_1439698711",
+      "id": "20171204-175420_1474978925",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 4, 2017 5:54:20 PM",
+      "dateStarted": "Dec 4, 2017 5:58:27 PM",
+      "dateFinished": "Dec 4, 2017 5:58:27 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "df.write.csv(\"s3://s3-ankit/Spam-data/mycsv.csv/suncountry_cluster.csv\")",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 7:39:57 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512410236727_131780669",
+      "id": "20171204-175716_1780446534",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Dec 4, 2017 5:57:16 PM",
+      "dateStarted": "Dec 4, 2017 7:39:57 PM",
+      "dateFinished": "Dec 4, 2017 7:40:20 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\nCluster Centers can be verified with the **clusterCenters()** command.",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 4, 2017 12:19:05 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512346352833_1254142318",
+      "id": "20171204-001232_1735313660",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003eCluster Centers can be verified with the \u003cstrong\u003eclusterCenters()\u003c/strong\u003e command.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 4, 2017 12:12:32 AM",
+      "dateStarted": "Dec 4, 2017 12:19:05 AM",
+      "dateFinished": "Dec 4, 2017 12:19:05 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "centers \u003d kmeans_bisecting.clusterCenters()\r\nprint(\"Cluster Centers: \")\r\nfor center in centers:\r\n    print(center)",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 6:01:33 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 103.6,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511633095881_1000118954",
+      "id": "20171125-180455_228944708",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "Cluster Centers: \n[ 0.          1.          0.          0.          0.          0.0807066   0.\n  0.32743967  0.24961277  0.26353547  0.31546942  0.27553039  0.27428634\n  0.20099432  0.62958737]\n[ 0.          1.          0.          0.          0.          0.08692609\n  1.          0.          0.          0.          0.35503589  0.23662278\n  0.25264758  0.20145385  0.71313993]\n[ 0.86552072  0.          0.05646181  0.05108897  0.02140112  0.07535387\n  0.14443622  0.47152802  0.12560778  0.09552309  0.19237393  0.49136031\n  0.17927191  0.1847228   0.36947494]\n[ 0.77038272  0.          0.07847789  0.07511303  0.0690527   0.07733023\n  0.78188074  0.          0.08194746  0.07037481  0.453397    0.12014498\n  0.29006123  0.1951568   0.80987673]\n"
+      },
+      "dateCreated": "Nov 25, 2017 6:04:55 PM",
+      "dateStarted": "Dec 4, 2017 6:01:33 PM",
+      "dateFinished": "Dec 4, 2017 6:01:33 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%md\n**computeCost()** will return the Bisecting K-means cost.  It is the sum of squared distances of points to their nearest center for this model on the given data. If provided with an RDD of points returns the sum.",
+      "user": "kamin089@umn.edu",
+      "dateUpdated": "Dec 4, 2017 12:18:51 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/markdown"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512346477585_2056944707",
+      "id": "20171204-001437_1256773151",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003cdiv class\u003d\"markdown-body\"\u003e\n\u003cp\u003e\u003cstrong\u003ecomputeCost()\u003c/strong\u003e will return the Bisecting K-means cost. It is the sum of squared distances of points to their nearest center for this model on the given data. If provided with an RDD of points returns the sum.\u003c/p\u003e\n\u003c/div\u003e"
+      },
+      "dateCreated": "Dec 4, 2017 12:14:37 AM",
+      "dateStarted": "Dec 4, 2017 12:18:51 AM",
+      "dateFinished": "Dec 4, 2017 12:18:51 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "kmeans_bisecting.computeCost(indexed)",
+      "user": "pande130@umn.edu",
+      "dateUpdated": "Dec 4, 2017 6:01:43 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1511633301245_418068845",
+      "id": "20171125-180821_1089170278",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "4112461.7713863174\n"
+      },
+      "dateCreated": "Nov 25, 2017 6:08:21 PM",
+      "dateStarted": "Dec 4, 2017 6:01:43 PM",
+      "dateFinished": "Dec 4, 2017 6:01:57 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1512288616041_-1497118515",
+      "id": "20171203-081016_1234090531",
+      "dateCreated": "Dec 3, 2017 8:10:16 AM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "sun_country2",
+  "id": "TETYBZHB261511205439",
+  "angularObjects": {
+    "2CZ66272U418151510596353934:shared_process": [],
+    "2CX5JE1BP418151510596353942:shared_process": [],
+    "2D1HGQUY3418151510596353907:shared_process": [],
+    "2CZ4DUATT418151510596353928:shared_process": []
+  },
+  "config": {
+    "isDashboard": false,
+    "looknfeel": "default",
+    "cronExecutingUser": "40461",
+    "cron_updated_by_useremail": "kamin089@umn.edu"
+  },
+  "info": {},
+  "source": "FCN"
+}
